@@ -1,0 +1,93 @@
+{% extends "appbuilder/base.html" %}
+{% block content %}
+<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+
+<div class="jumbotron row">
+    
+  
+    <div class="col-md-6" style="text-align:left; vertical-align:top">
+        
+            
+            <h3><span style="color:#4b1f68">ASK BAPCO </span>PROJECT</h3>
+              
+            <p>Document Naming Engine</small></p>
+            
+            <div align="justify">
+              <br>
+            <p>
+                The purpose of this application is to identify the types of document used for the
+                BAPCO PROJECT and to define the naming conventions applicable to documents.
+
+                An overview of the purpose of the different document types, and their role in the
+                Project, is presented. 
+
+            </p>
+            <div align="right">
+            </div>
+            <!--
+            <p><strong>PM:&nbsp</strong>Aglaia Ciuna</p>
+        
+            <p><i class="fas fa-envelope"></i>&nbspa.ciuna@quasarPM.com</small></p>
+            -->
+          </div>
+          
+    </div> 
+       
+    
+    <div class="col-md-6" style="text-align:left; padding-left: 100px";>
+        <hr><small>
+            <br>
+            <br>
+            <p><a href="/docrequestsview/list/"><img border="0" src="/static/img/engineering.png" alt="W3Schools" width="48" height="48">&nbsp Engineering Codes</a></p>
+            <br>
+            <br>
+            <p><a href="/vendorrequestsview/list/"><img border="0" src="/static/img/vendor.png" href="/docrequestsview/list/" alt="W3Schools" width="48" height="48">&nbsp Vendor Codes</a></p>
+            
+          
+            <!--<h3><a href="/docrequestsview/list/"><img border="0" src="/static/img/logo_technipfmc_w.png" alt="W3Schools" class="center" width="70%" height="70%"></a></h3>
+            -->
+            <!--<p>{{_("In this area you can also list, add, edit, delete and export bapco's codes. Functionalities and permissions are based on you role.  ")}}</p>-->
+            <!--<a class="btn btn-primary" href="#" role="button">Vendor Code</a>-->
+        
+    </div>
+</div>
+
+<!--
+
+<div class="jumbotron" style="text-align:center">
+  <div class="container">
+    <p><img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64"></p>
+    <h1>{{_("Update from Excel")}}</h1>
+    <h2>{{_("Document Encoding Tool by QuasarPM.com")}}</h2>
+    <p>{{_("Generate unique code for Bapco")}}</p>
+<script>
+
+  //Dropzone.autoDiscover = false;
+  Dropzone.uploadMultiple = true;
+  Dropzone.options.myDropzone = {
+    uploadMultiple: true,
+    paramName: "file",
+  };
+  //Dropzone.parallelUploads = 1;
+  Dropzone.autoProcessQueue = false;
+</script>
+    <form action="/uploadcodes/excel/ajax" method="POST" class="dropzone" id="my-dropzone">
+
+      <div class="fallback">
+          <input name="file" type="file" multiple />
+          <input type="submit" value="Upload" class="btn btn-success"/>button
+      </div>
+    </form>
+    <script>
+        document.write(moment("2012-12-31T23:55:13Z").format('LLLL'));
+        </script>
+    
+    <script>
+      function sendForm(){
+        Dropzone.processQueue();
+      }
+    </script>
+  </div>
+</div>
+-->
+{% endblock %}

@@ -1,0 +1,58 @@
+/*h1 {
+    color: red !important;
+}
+
+.navbar-inverse {
+    background-image: linear-gradient(#ec0040, #c50333 60%, #c10036);
+}
+
+body {
+    background-color: #c10036;
+}
+
+.navbar-inverse {
+    background-image: linear-gradient(#e9242d, #e9242d 60%, #e9242d);
+
+}
+.dropzone {
+    min-height: 150px;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    background:darkred;
+    padding: 20px 20px;
+}
+
+.logo {
+    text-align: center;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color:white;
+}
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #c8c8c8;
+    background-color: #272b30;
+}
+.container {
+    height: 100%;
+}
+*/
+.navbar-inverse {
+    background-color: #4b1f68;
+}
+
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+    z-index: 3;
+    color: #ffffff;
+    background-color: #4b1f68;
+    border-color: transparent;
+    cursor: default;
+}
+
+
+table {
+    font-size: 14px;
+}
+
+
