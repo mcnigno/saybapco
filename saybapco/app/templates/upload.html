@@ -1,0 +1,41 @@
+{% extends "appbuilder/base.html" %}
+{% block content %}
+
+<div class="jumbotron" style="text-align:center">
+  <div class="container">
+    <p><img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64"></p>
+    <h1>{{_("Update from Excel")}}</h1>
+    <h2>{{_("Document Encoding Tool by QuasarPM.com")}}</h2>
+    <p>{{_("Generate unique code for Bapco")}}</p>
+<script>
+
+  //Dropzone.autoDiscover = false;
+  Dropzone.uploadMultiple = true;
+  Dropzone.options.myDropzone = {
+    uploadMultiple: true,
+    paramName: "file",
+  };
+  //Dropzone.parallelUploads = 1;
+  Dropzone.autoProcessQueue = false;
+</script>
+    <form action="/uploadcodes/excel/ajax" method="POST" class="dropzone" id="my-dropzone">
+
+      <div class="fallback">
+          <input name="file" type="file" multiple />
+          <input type="submit" value="Upload" class="btn btn-success"/>button
+      </div>
+    </form>
+    <script>
+        document.write(moment("2012-12-31T23:55:13Z").format('LLLL'));
+        </script>
+    
+    <script>
+      function sendForm(){
+        Dropzone.processQueue();
+      }
+    </script>
+  </div>
+</div>
+
+
+{% endblock %}
