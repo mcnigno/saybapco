@@ -20,7 +20,7 @@ CSRF_ENABLED = True
 APP_NAME = "SAY BAPCO"
 
 # Uncomment to setup Setup an App icon
-#APP_ICON = "static/img/logo.jpg"
+APP_ICON = "/static/img/logo.png"
 
 #----------------------------------------------------
 # AUTHENTICATION CONFIG
@@ -99,6 +99,6 @@ IMG_UPLOAD_URL = '/static/uploads/'
 #APP_THEME = "simplex.css"
 #APP_THEME = "slate.css"   
 #APP_THEME = "spacelab.css"
-#APP_THEME = "united.css"
-APP_THEME = "yeti.css"
+APP_THEME = "united.css"
+#APP_THEME = "yeti.css"
 
