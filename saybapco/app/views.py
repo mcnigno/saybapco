@@ -9,12 +9,12 @@ from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggreg
 
 
 
-
-class UploadComments(BaseView):
-    default_view = 'upload'
-    @expose('/upload', methods=('POST','GET'))
-    def upload(self):
-        return self.render_template('upload.html')
+#
+#class UploadComments(BaseView):
+#    default_view = 'upload'
+#    @expose('/upload', methods=('POST','GET'))
+#    def upload(self):
+#        return self.render_template('upload.html')
 
 
 class CommentView(ModelView):
@@ -123,9 +123,9 @@ def page_not_found(e):
 
 db.create_all()
 
-appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+#appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(RevisionView,'Revisions',icon="fas fa-code-branch", category="My Category", category_icon='fas fa-comment')
+appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="My Category", category_icon='fas fa-comment')
