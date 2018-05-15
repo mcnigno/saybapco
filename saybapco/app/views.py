@@ -6,7 +6,7 @@ from .models import Document, Comments, Revisions
 from helpers import comments, check_Doc
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
-
+from flask_appbuilder import action
 
 
 #
@@ -33,7 +33,15 @@ class CommentView(ModelView):
     list_columns = ['document','author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
-    edit_exclude_columns = ['created_on', 'changed_on'] 
+    edit_exclude_columns = ['created_on', 'changed_on']
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
 
 class CommentsChart(GroupByChartView):
     datamodel = SQLAInterface(Comments)
