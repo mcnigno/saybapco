@@ -26,7 +26,7 @@ class CommentView(ModelView):
         'pretty_style' : 'Type',
         'pretty_included': 'in',
         'pretty_closed': 'done',
-        'doc': 'Document',
+        'doc': 'Bapco Code',
         'pretty_comment': 'Comments',
         'pretty_reply': 'Replies'
     }
@@ -102,7 +102,7 @@ class DocumentView(ModelView):
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     label_columns = {
-        'name': 'Name',
+        'name': 'Bapco Code',
         'count': 'Tot',
         'count_included': 'Included',
         'count_closed': 'Closed'
