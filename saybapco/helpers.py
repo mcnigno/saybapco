@@ -47,6 +47,7 @@ def comments(item):
                 #print(row[2].value)
                 #print(sanetext(row[3].value))
                 style = sanetext(row[1].value)
+                page = sanetext(row[2].value)
                 author = sanetext(row[2].value)
                 comment = sanetext(row[3].value)
                 reply = sanetext(row[4].value)
@@ -68,7 +69,7 @@ def comments(item):
                     included = False
                 
                 
-                comm = comments(style=style, author=author, comment=comment,
+                comm = comments(style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id)
                 
@@ -87,7 +88,7 @@ def comments(item):
 def check_Doc(self, item):
     filename = get_file_original_name(item.file)
     unit = filename[0:3]
-    partner = "?"
+    partner = item.trasmittal[4:6]
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
