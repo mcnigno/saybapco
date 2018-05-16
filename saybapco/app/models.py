@@ -32,7 +32,7 @@ class Document(AuditMixin, Model):
     materialclass = Column(String(1), nullable=False)
     doctype = Column(String(3), nullable=False)
     serial = Column(String(5), nullable=False)
-    partner = Column(String(1), nullable=False)
+    partner = Column(String(3), nullable=False)
 
     def __repr__(self):
         name = '_'.join([self.unit, self.materialclass,
@@ -72,7 +72,7 @@ class Revisions(AuditMixin, Model):
     file = Column(FileColumn, nullable=False)
     revision = Column(String(30))
     trasmittal = Column(String(30), nullable=False)
-    data_trs = Column(Date, nullable=False)
+    date_trs = Column(Date, nullable=False)
     note = Column(String(250))
     document_id = Column(Integer, ForeignKey('document.id'), nullable=False)
     document = relationship(Document)
