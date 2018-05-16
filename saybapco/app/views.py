@@ -3,10 +3,12 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc
+from helpers import comments, check_Doc, check_reply
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action
+from flask_appbuilder.filemanager import get_file_original_name
+
 
 
 #
@@ -31,7 +33,9 @@ class CommentView(ModelView):
         'pretty_reply': 'Replies'
     }
     list_columns = ['document','revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+
     #list_widget = ListThumbnail
+    
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     show_exclude_columns = ['comments']
@@ -99,6 +103,12 @@ class RevisionView(ModelView):
 
     def pre_add(self,item):
         item.document_id = check_Doc(self, item)
+        
+        filename = get_file_original_name(item.file)
+        print('Reply:', filename[-5:-9])
+        
+        if filename[-5:-9] == "REP":
+            item.reply = True
 
 
     def post_add(self, item):

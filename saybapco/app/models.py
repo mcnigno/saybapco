@@ -76,6 +76,7 @@ class Revisions(AuditMixin, Model):
     note = Column(String(250))
     document_id = Column(Integer, ForeignKey('document.id'), nullable=False)
     document = relationship(Document)
+    reply = Column(Boolean, default=False)
 
     def file_name(self):
         return get_file_original_name(str(self.file))
@@ -101,6 +102,7 @@ class Comments(AuditMixin, Model):
     revision_id = Column(Integer, ForeignKey('revisions.id'))
     revision = relationship(Revisions, backref='comments')
     page = Column(String(30), default ='-' )
+    note = Column(String(250))
 
     def __repr__(self):
         return self.comment

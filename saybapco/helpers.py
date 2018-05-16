@@ -11,6 +11,13 @@ def sanetext(input_string):
     if input_string is not None:
         return re.sub("_x([0-9A-F]{4})_", parse_escaped_character_match, str(input_string))
     return " "
+
+
+#
+#  Add Revisions uploading a Comment file by Bluebin.
+#
+
+
 def comments(item):
     print('file processed:', str(item.file))
     file = open(UPLOAD_FOLDER + item.file, mode='rb')
@@ -34,29 +41,41 @@ def comments(item):
     session = db.session
     comments= models.Comments
     session.query(comments).filter(comments.document_id == item.document_id).delete()
+    
     #session.commit()
     #check columns label
     #for row in ws.iter_colum()
+    partner = item.trasmittal[4:7]
 
     for row in ws.iter_rows(min_row=2):
         if row[3].value is not None:
             try:
+
                 print(filename)
                 print('      ')
                 print(unit, mat, doctype, serial)
+
                 #print(row[2].value)
                 #print(sanetext(row[3].value))
+
+                id = sanetext(row[0].value)
                 style = sanetext(row[1].value)
                 page = sanetext(row[2].value)
-                author = sanetext(row[2].value)
-                comment = sanetext(row[3].value)
-                reply = sanetext(row[4].value)
-                included = sanetext(row[5].value)
-                closed = sanetext(row[6].value)
+                author = sanetext(row[3].value)
+                comment = sanetext(row[4].value)
+                reply = sanetext(row[5].value)
+                included = sanetext(row[6].value)
+                closed = sanetext(row[7].value)
+
+
                 print(style, author)
+                
                 print(comment)
+                
                 print(reply)
+                
                 print(included, closed)
+
 
                 if closed == 'Y':
                     closed = True
@@ -69,10 +88,9 @@ def comments(item):
                     included = False
                 
                 
-                comm = comments(style=style, page=page, author=author, comment=comment,
+                comm = comments(id=id, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id)
-                
                 
                 
                 session.add(comm)
@@ -88,7 +106,7 @@ def comments(item):
 def check_Doc(self, item):
     filename = get_file_original_name(item.file)
     unit = filename[0:3]
-    partner = item.trasmittal[4:6]
+    partner = item.trasmittal[4:7]
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
@@ -105,7 +123,15 @@ def check_Doc(self, item):
                        serial=serial, partner=partner)
         
         session.add(document)
+
         session.flush()
+
         return document.id
     
 
+def check_reply(self, item):
+    filename = get_file_original_name(item.file)
+    if filename[-5:-9] == "REP":
+        item.reply = True
+
+    
