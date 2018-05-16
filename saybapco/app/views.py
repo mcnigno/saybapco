@@ -34,6 +34,8 @@ class CommentView(ModelView):
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
+    show_exclude_columns = ['comments']
+    
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
         if isinstance(items, list):
@@ -91,6 +93,7 @@ class RevisionView(ModelView):
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'data_trs', 'note']
+    show_exclude_columns = ['comments']
 
     related_views = [CommentView]
 
