@@ -92,7 +92,7 @@ class RevisionView(ModelView):
     list_columns = ['revision', 'trasmittal', 'pretty_date', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    add_columns = ['file', 'revision', 'data_trs', 'note']
+    add_columns = ['file', 'revision', 'trasmittal', 'pretty_date', 'note']
     show_exclude_columns = ['comments']
 
     related_views = [CommentView]
