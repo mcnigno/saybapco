@@ -27,7 +27,7 @@ class CommentView(ModelView):
         'pretty_included': 'Included',
         'pretty_closed': 'Closed',
         'doc': 'Bapco Code',
-        'pretty_comment': 'Comments'
+        'pretty_comment': 'Comments',
         'pretty_reply': 'Replies'
     }
     list_columns = ['document','author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']

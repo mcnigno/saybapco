@@ -35,6 +35,8 @@ def comments(item):
     comments= models.Comments
     session.query(comments).filter(comments.document_id == item.document_id).delete()
     #session.commit()
+    #check columns label
+    #for row in ws.iter_colum()
 
     for row in ws.iter_rows(min_row=2):
         if row[3].value is not None:
