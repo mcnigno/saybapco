@@ -35,7 +35,7 @@ class CommentView(ModelView):
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     show_exclude_columns = ['comments']
-    
+
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
         if isinstance(items, list):
@@ -89,10 +89,10 @@ class CommentsPieChart(GroupByChartView):
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
-    list_columns = ['revision', 'trasmittal', 'data_trs', 'note', 'file_name', 'download']
+    list_columns = ['revision', 'trasmittal', 'pretty_date', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    add_columns = ['file', 'revision', 'trasmittal', 'data_trs', 'note']
+    add_columns = ['file', 'revision', 'data_trs', 'note']
     show_exclude_columns = ['comments']
 
     related_views = [CommentView]

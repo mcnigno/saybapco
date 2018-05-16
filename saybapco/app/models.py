@@ -63,6 +63,9 @@ class Document(AuditMixin, Model):
             if comment.closed:
                 count += 1
         return count
+    
+    def pretty_date(self):
+        return self.created_on.strftime('%d, %b %Y')
 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
@@ -82,6 +85,8 @@ class Revisions(AuditMixin, Model):
         return Markup(
             '<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '">Download</a>')
 
+    def pretty_date(self):
+        return self.created_on.strftime('%d, %b %Y')
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
@@ -132,3 +137,6 @@ class Comments(AuditMixin, Model):
 
     def pretty_reply(self):
         return self.reply[:75]
+    
+    def pretty_date(self):
+        return self.created_on.strftime('%d, %b %Y')
