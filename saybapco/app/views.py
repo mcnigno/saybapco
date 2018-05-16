@@ -109,6 +109,7 @@ class DocumentView(ModelView):
     related_views = [CommentView, RevisionView]
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
+    show_exclude_columns = ['comments']
     label_columns = {
         'name': 'Bapco Code',
         'count': 'Tot',
