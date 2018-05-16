@@ -95,6 +95,7 @@ class Comments(AuditMixin, Model):
     document = relationship(Document, backref='comments')
     revision_id = Column(Integer, ForeignKey('revisions.id'))
     revision = relationship(Revisions, backref='comments')
+    page = Column(String(30), default ='-' )
 
     def __repr__(self):
         return self.comment
