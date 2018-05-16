@@ -132,8 +132,8 @@ def page_not_found(e):
 db.create_all()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="My Category", category_icon='fas fa-comment')
+appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
