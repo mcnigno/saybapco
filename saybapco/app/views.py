@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, redirect
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
