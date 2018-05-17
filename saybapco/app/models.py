@@ -41,7 +41,7 @@ class Document(AuditMixin, Model):
 
     def name(self):
         name = '-'.join([self.unit, self.materialclass,
-                        self.doctype, self.partner])
+                        self.doctype, self.serial])
         return name
 
     def comment(self):

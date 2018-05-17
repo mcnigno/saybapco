@@ -28,7 +28,7 @@ class CommentView(ModelView):
         'pretty_style' : 'Type',
         'pretty_included': 'Included',
         'pretty_closed': 'Closed',
-        'doc': 'Bapco Code',
+        'document': 'Bapco Code',
         'pretty_comment': 'Comments',
         'pretty_reply': 'Replies',
         'pretty_revision': 'Rev',
@@ -132,7 +132,7 @@ class DocumentView(ModelView):
         'count_closed': 'Closed',
         'count_open': 'Open',
     }
-    list_columns = ['name','revision', 'count', 'count_open', 'count_closed', 'count_included']
+    list_columns = ['name','partner', 'revision', 'count', 'count_open', 'count_closed', 'count_included']
 
 
 """
