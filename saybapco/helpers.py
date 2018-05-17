@@ -127,7 +127,7 @@ def check_Doc(self, item):
         return document.id
     else:
         document = doc(unit=unit, materialclass=mat, doctype=doctype, 
-                       serial=serial, , sheet=sheet, partner=partner)
+                       serial=serial, sheet=sheet, partner=partner)
         
         session.add(document)
 

@@ -125,7 +125,8 @@ class DocumentView(ModelView):
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
-    search_columns = ['count_open', 'count_closed', 'name', 'partner' ]
+    search_exclude_columns = ['created_on', 'changed_on']
+    #search_columns = ['name', 'partner' ]
     label_columns = {
         'name': 'Bapco Code',
         'count': 'Tot',

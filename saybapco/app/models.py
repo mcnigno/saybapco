@@ -33,7 +33,7 @@ class Document(AuditMixin, Model):
     doctype = Column(String(3), nullable=False)
     serial = Column(String(5), nullable=False)
     partner = Column(String(3), nullable=False)
-    sheet = Column(String(3), nullable=)
+    sheet = Column(String(3))
 
     def __repr__(self):
         name = '-'.join([self.unit, self.materialclass,
