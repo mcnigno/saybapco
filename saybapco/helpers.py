@@ -42,7 +42,9 @@ def comments(item):
     session = db.session
     comments= models.Comments
     #session.query(comments).filter(comments.document_id == item.document_id).delete()
-    
+    print('before doc_rev query for doc id, rev_id:', comments.document_id, item.document_id, comments.revision, item.revision)
+    doc_rev = session.query(comments).filter(comments.document_id == item.document_id, comments.revision in item.revision).first()
+    print('this is the doc_rev', doc_rev)
     #session.commit()
     #check columns label
     #for row in ws.iter_colum()
@@ -93,12 +95,25 @@ def comments(item):
                     included = False
                 
                 print('before comment')
-                comm = comments( id_c=id_c, partner=partner,style=style, page=page, author=author, comment=comment,
-                                reply=reply, included=included, closed=closed,
-                                document_id=item.document_id, revision_id=item.id)
-                
-                
-                session.add(comm)
+
+                if doc_rev:
+                    print('doc_rev is there')
+
+                    doc_rev.reply = reply
+                    doc_rev.included = included
+                    doc_rev.closed = closed
+
+                    session.edit(doc_rev)
+                    session.commit()
+                else:
+
+
+                    comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
+                                    reply=reply, included=included, closed=closed,
+                                    document_id=item.document_id, revision_id=item.id)
+                    
+                    session.add(comm)
+
                 print('after comment')
             
                 
