@@ -19,6 +19,7 @@ def sanetext(input_string):
 
 
 def comments(item):
+
     print('file processed:', str(item.file))
     file = open(UPLOAD_FOLDER + item.file, mode='rb')
     print('file processed:', file)
@@ -34,22 +35,36 @@ def comments(item):
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
+    type_reply = False
+    try:
+        print('Reply identification: ', filename[27:30] )
+        if filename[26:29] == "REP":
+            type_reply = True
+    except:
+        pass
     
-
     wb = openpyxl.load_workbook(file)
     ws = wb.active
 
     session = db.session
     comments= models.Comments
-    #session.query(comments).filter(comments.document_id == item.document_id).delete()
-    print('before doc_rev query for doc id, rev_id:', comments.document_id, item.document_id, comments.revision, item.revision)
-    doc_rev = session.query(comments).filter(comments.document_id == item.document_id, comments.revision in item.revision).first()
-    print('this is the doc_rev', doc_rev)
+    documents = models.Document
+    revisions = models.Revisions
+
+    revision = session.query(revisions).filter(revisions.revision == item.revision).first()
+    
+    try:
+        session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+    except:
+        pass
+    
+
     #session.commit()
     #check columns label
     #for row in ws.iter_colum()
-    partner = item.trasmittal[4:7]
-    revision = item.revision
+    
+    partner = item.partner
+    #revision = item.revision
 
     for row in ws.iter_rows(min_row=2):
         print(row[0].value, row[1].value, row[2].value,
@@ -58,12 +73,6 @@ def comments(item):
             print('row 0 in not null', row[0].value)
             try:
 
-                #print(filename)
-                #print('      ')
-                #print(unit, mat, doctype, serial)
-
-                #print(row[2].value)
-                #print(sanetext(row[3].value))
 
                 id_c = sanetext(row[0].value)
                 style = sanetext(row[1].value)
@@ -75,13 +84,8 @@ def comments(item):
                 closed = sanetext(row[7].value)
 
 
-                print(id_c, partner, style, author)
+                print(id_c, style, author)
                 
-                #print(comment)
-                
-                #print(reply)
-                
-                #print(included, closed)
 
 
                 if closed == 'Y':
@@ -93,26 +97,13 @@ def comments(item):
                     included = True
                 else:
                     included = False
-                
+                                
                 print('before comment')
-
-                if doc_rev:
-                    print('doc_rev is there')
-
-                    doc_rev.reply = reply
-                    doc_rev.included = included
-                    doc_rev.closed = closed
-
-                    session.edit(doc_rev)
-                    session.commit()
-                else:
-
-
-                    comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
-                                    reply=reply, included=included, closed=closed,
-                                    document_id=item.document_id, revision_id=item.id)
-                    
-                    session.add(comm)
+                comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
+                                reply=reply, included=included, closed=closed,
+                                document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
+                
+                session.add(comm)
 
                 print('after comment')
             
@@ -133,13 +124,14 @@ def check_Doc(self, item):
     serial = filename[10:15]
     sheet = filename[16:19]
 
+
     session = db.session
     doc = models.Document
     document = session.query(doc).filter(doc.unit == unit, doc.materialclass == mat,
                                  doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
-        return document.id
+        return document.id, document.partner
     else:
         document = doc(unit=unit, materialclass=mat, doctype=doctype, 
                        serial=serial, sheet=sheet, partner=partner)
@@ -148,12 +140,17 @@ def check_Doc(self, item):
 
         session.flush()
 
-        return document.id
+        return document.id, document.partner
     
 
 def check_reply(self, item):
     filename = get_file_original_name(item.file)
-    if filename[-5:-9] == "REP":
-        item.reply = True
-
+    try:
+        print('Reply identification: ', filename[27:30] )
+        if filename[26:29] == "REP":
+            return True
+    except:
+        return False
+    
+    
     

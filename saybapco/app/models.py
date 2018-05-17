@@ -87,6 +87,8 @@ class Revisions(AuditMixin, Model):
     reply = Column(Boolean, default=False)
 
     def __repr__(self):
+        if self.reply:
+            return self.revision +"-Reply"
         return self.revision
 
     def file_name(self):
@@ -99,6 +101,11 @@ class Revisions(AuditMixin, Model):
 
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
+    
+    def pretty_revision(self):
+        if self.reply:
+            return self.revision +"-Reply"
+        return self.revision
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
@@ -109,6 +116,7 @@ class Comments(AuditMixin, Model):
     reply = Column(String(500), default='no reply')
     included = Column(Boolean, default=False)
     closed = Column(Boolean, default=False)
+    type_reply = Column(Boolean, default=False)
     document_id = Column(Integer, ForeignKey('document.id'))
     document = relationship(Document, backref='comments')
     revision_id = Column(Integer, ForeignKey('revisions.id'))
@@ -151,6 +159,7 @@ class Comments(AuditMixin, Model):
         return self.comment[:75]
 
     def pretty_reply(self):
+        
         return self.reply[:75]
     
     def pretty_date(self):

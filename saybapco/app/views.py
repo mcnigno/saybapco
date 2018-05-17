@@ -95,7 +95,11 @@ class CommentsPieChart(GroupByChartView):
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
-    list_columns = ['revision', 'trasmittal', 'pretty_date', 'note', 'file_name', 'download']
+    label_columns = {
+        'pretty_revision': 'Rev.',
+        'pretty_date': 'Date'
+    }
+    list_columns = ['pretty_revision', 'trasmittal', 'pretty_date', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
@@ -104,14 +108,11 @@ class RevisionView(ModelView):
     related_views = [CommentView]
 
     def pre_add(self,item):
-        item.document_id = check_Doc(self, item)
+        item.document_id, item.partner = check_Doc(self, item)
+        item.reply = check_reply(self, item)
         
         filename = get_file_original_name(item.file)
-        print('Reply:', filename[-5:-9])
         
-        if filename[-5:-9] == "REP":
-            item.reply = True
-
 
     def post_add(self, item):
         
