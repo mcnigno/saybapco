@@ -40,25 +40,29 @@ def comments(item):
 
     session = db.session
     comments= models.Comments
-    session.query(comments).filter(comments.document_id == item.document_id).delete()
+    #session.query(comments).filter(comments.document_id == item.document_id).delete()
     
     #session.commit()
     #check columns label
     #for row in ws.iter_colum()
     partner = item.trasmittal[4:7]
+    revision = item.revision
 
     for row in ws.iter_rows(min_row=2):
-        if row[3].value is not None:
+        print(row[0].value, row[1].value, row[2].value,
+              row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
+        if row[0].value is not None:
+            print('row 0 in not null', row[0].value)
             try:
 
-                print(filename)
-                print('      ')
-                print(unit, mat, doctype, serial)
+                #print(filename)
+                #print('      ')
+                #print(unit, mat, doctype, serial)
 
                 #print(row[2].value)
                 #print(sanetext(row[3].value))
 
-                id = sanetext(row[0].value)
+                id_c = sanetext(row[0].value)
                 style = sanetext(row[1].value)
                 page = sanetext(row[2].value)
                 author = sanetext(row[3].value)
@@ -68,13 +72,13 @@ def comments(item):
                 closed = sanetext(row[7].value)
 
 
-                print(style, author)
+                print(id_c, partner, style, author)
                 
-                print(comment)
+                #print(comment)
                 
-                print(reply)
+                #print(reply)
                 
-                print(included, closed)
+                #print(included, closed)
 
 
                 if closed == 'Y':
@@ -87,13 +91,14 @@ def comments(item):
                 else:
                     included = False
                 
-                
-                comm = comments(id=id, partner=partner, style=style, page=page, author=author, comment=comment,
+                print('before comment')
+                comm = comments( id_c=id_c, partner=partner,style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id)
                 
                 
                 session.add(comm)
+                print('after comment')
             
                 
             except:

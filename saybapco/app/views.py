@@ -21,18 +21,20 @@ from flask_appbuilder.filemanager import get_file_original_name
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['included','closed', 'document']
-    base_order = ('id','asc')
-    order_columns = ['id']
+    search_columns = ['included','closed', 'document','revision']
+    base_order = ('id_c','asc')
+    order_columns = ['id_c']
     label_columns = {
         'pretty_style' : 'Type',
         'pretty_included': 'Included',
         'pretty_closed': 'Closed',
         'doc': 'Bapco Code',
         'pretty_comment': 'Comments',
-        'pretty_reply': 'Replies'
+        'pretty_reply': 'Replies',
+        'pretty_revision': 'Rev',
+        'id_c': 'ID-C',
     }
-    list_columns = ['document','revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    list_columns = ['document','id_c','partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
 
     #list_widget = ListThumbnail
     
@@ -127,9 +129,10 @@ class DocumentView(ModelView):
         'name': 'Bapco Code',
         'count': 'Tot',
         'count_included': 'Included',
-        'count_closed': 'Closed'
+        'count_closed': 'Closed',
+        'count_open': 'Open',
     }
-    list_columns = ['name', 'count', 'count_closed', 'count_included']
+    list_columns = ['name','revision', 'count', 'count_open', 'count_closed', 'count_included']
 
 
 """

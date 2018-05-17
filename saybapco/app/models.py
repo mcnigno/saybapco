@@ -35,7 +35,7 @@ class Document(AuditMixin, Model):
     partner = Column(String(3), nullable=False)
 
     def __repr__(self):
-        name = '_'.join([self.unit, self.materialclass,
+        name = '-'.join([self.unit, self.materialclass,
                         self.doctype, self.serial])
         return name
 
@@ -46,6 +46,9 @@ class Document(AuditMixin, Model):
 
     def comment(self):
         return self.comments
+    
+    def revision(self):
+        return str(self.revision)
     
     def count(self):
         return len(self.comments)
@@ -63,6 +66,10 @@ class Document(AuditMixin, Model):
             if comment.closed:
                 count += 1
         return count
+
+    def count_open(self):
+        count_open = self.count() - self.count_closed()
+        return count_open
     
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
@@ -75,8 +82,11 @@ class Revisions(AuditMixin, Model):
     date_trs = Column(Date, nullable=False)
     note = Column(String(250))
     document_id = Column(Integer, ForeignKey('document.id'), nullable=False)
-    document = relationship(Document)
+    document = relationship(Document, backref='revision')
     reply = Column(Boolean, default=False)
+
+    def __repr__(self):
+        return self.revision
 
     def file_name(self):
         return get_file_original_name(str(self.file))
@@ -91,6 +101,7 @@ class Revisions(AuditMixin, Model):
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
+    id_c = Column(Integer)
     style = Column(String(30), default='no type')
     author = Column(String(100), default='no author')
     comment = Column(String(500), default='no comment')
@@ -102,6 +113,7 @@ class Comments(AuditMixin, Model):
     revision_id = Column(Integer, ForeignKey('revisions.id'))
     revision = relationship(Revisions, backref='comments')
     page = Column(String(30), default ='-' )
+    partner = Column(String(3), nullable=False)
     note = Column(String(250))
 
     def __repr__(self):
@@ -142,3 +154,6 @@ class Comments(AuditMixin, Model):
     
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
+    
+    def pretty_revision(self):
+        return self.revision.revision
