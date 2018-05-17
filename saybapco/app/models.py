@@ -33,15 +33,16 @@ class Document(AuditMixin, Model):
     doctype = Column(String(3), nullable=False)
     serial = Column(String(5), nullable=False)
     partner = Column(String(3), nullable=False)
+    sheet = Column(String(3), nullable=)
 
     def __repr__(self):
         name = '-'.join([self.unit, self.materialclass,
-                        self.doctype, self.serial])
+                        self.doctype, self.serial, self.sheet])
         return name
 
     def name(self):
         name = '-'.join([self.unit, self.materialclass,
-                        self.doctype, self.serial])
+                        self.doctype, self.serial, self.sheet])
         return name
 
     def comment(self):

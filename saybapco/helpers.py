@@ -34,6 +34,7 @@ def comments(item):
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
+    
 
     wb = openpyxl.load_workbook(file)
     ws = wb.active
@@ -115,17 +116,18 @@ def check_Doc(self, item):
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
+    sheet = filename[16:19]
 
     session = db.session
     doc = models.Document
     document = session.query(doc).filter(doc.unit == unit, doc.materialclass == mat,
-                                 doc.doctype == doctype, doc.serial == serial).first()
+                                 doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
         return document.id
     else:
         document = doc(unit=unit, materialclass=mat, doctype=doctype, 
-                       serial=serial, partner=partner)
+                       serial=serial, , sheet=sheet, partner=partner)
         
         session.add(document)
 
