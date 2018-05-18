@@ -21,7 +21,7 @@ from flask_appbuilder.filemanager import get_file_original_name
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['included','closed', 'document','revision']
+    search_columns = ['included','closed', 'document','revision', 'reply']
     base_order = ('id_c','asc')
     order_columns = ['id_c']
     label_columns = {
@@ -53,7 +53,7 @@ class CommentView(ModelView):
 
 class CommentsChart(GroupByChartView):
     datamodel = SQLAInterface(Comments)
-    #chart_type = 'PieChart'
+    chart_type = 'BarChart'
     definitions = [
        
         {
@@ -71,7 +71,8 @@ class CommentsChart(GroupByChartView):
             'series': [
                 (aggregate_count, 'comment'),
                 (aggregate_sum, 'closed'),
-                (aggregate_sum, 'included')             
+                (aggregate_sum, 'included'),
+                (aggregate_count, 'open_comments')             
             ]
         }
         ]
@@ -134,8 +135,9 @@ class DocumentView(ModelView):
         'count_included': 'Included',
         'count_closed': 'Closed',
         'count_open': 'Open',
+        'count_no_reply': "No Reply",
     }
-    list_columns = ['name','partner', 'revision', 'count', 'count_open', 'count_closed', 'count_included']
+    list_columns = ['name','partner', 'revision', 'count', 'count_open','count_no_reply', 'count_closed', 'count_included']
 
 
 """

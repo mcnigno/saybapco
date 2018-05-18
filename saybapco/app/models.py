@@ -67,6 +67,13 @@ class Document(AuditMixin, Model):
             if comment.closed:
                 count += 1
         return count
+    
+    def count_no_reply(self):
+        count = 0
+        for comment in self.comments:
+            if comment.reply == " " and comment.included == False:
+                count += 1
+        return count
 
     def count_open(self):
         count_open = self.count() - self.count_closed()
@@ -167,3 +174,8 @@ class Comments(AuditMixin, Model):
     
     def pretty_revision(self):
         return self.revision.revision
+
+    def open_comments(self):
+        if self.closed == True:
+            return False
+        return True

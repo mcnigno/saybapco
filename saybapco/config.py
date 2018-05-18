@@ -99,6 +99,6 @@ IMG_UPLOAD_URL = '/static/uploads/'
 #APP_THEME = "simplex.css"
 #APP_THEME = "slate.css"   
 #APP_THEME = "spacelab.css"
-APP_THEME = "united.css"
-#APP_THEME = "yeti.css"
+#APP_THEME = "united.css"
+APP_THEME = "yeti.css"
 
