@@ -172,8 +172,8 @@ class Comments(AuditMixin, Model):
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
     
-    #def pretty_revision(self):
-        #return self.revision.revision
+    def pretty_revision(self):
+        return self.revision.revision
 
     def open_comments(self):
         if self.closed == True:
