@@ -148,7 +148,7 @@ def check_reply(self, item):
     filename = get_file_original_name(item.file)
     try:
         print('Reply identification: ', filename[27:30] )
-        if filename[26:29] == "REP":
+        if filename[-5:-2] == "REP":
             return True
     except:
         return False
