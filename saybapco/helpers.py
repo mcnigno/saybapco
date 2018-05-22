@@ -38,7 +38,8 @@ def comments(item):
     type_reply = False
     try:
         print('Reply identification: ', filename[27:30] )
-        if filename[26:29] == "REP":
+        #if filename[26:29] == "REP":
+        if filename[-5:-2] == "REP":
             type_reply = True
     except:
         pass
