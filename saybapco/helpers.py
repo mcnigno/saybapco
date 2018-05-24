@@ -36,10 +36,11 @@ def comments(item):
     doctype = filename[6:9]
     serial = filename[10:15]
     type_reply = False
+
     try:
-        print('Reply identification: ', filename[-10:-7] )
+        print('Reply identification: ', filename[-8:-5] )
         #if filename[26:29] == "REP":
-        if filename[-10:-7] == "REP":
+        if filename[-8:-5] == "REP":
             type_reply = True
     except:
         pass
@@ -52,11 +53,14 @@ def comments(item):
     documents = models.Document
     revisions = models.Revisions
 
-    revision = session.query(revisions).filter(revisions.revision == item.revision).first()
-    
+    revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
+    #revision = session.query(revisions).filter(revisions.id == item.id).first()
+
     try:
+        print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
     except:
+        print('some problem here')
         pass
     
 
@@ -148,8 +152,8 @@ def check_reply(self, item):
     filename = get_file_original_name(item.file)
     try:
         print('this is the Check reply Functions....')
-        print('Reply identification: ', filename[-10:-7] )
-        if filename[-10:-7] == "REP":
+        print('Reply identification: ', filename[-8:-5] )
+        if filename[-8:-5] == "REP":
             return True
     except:
         return False

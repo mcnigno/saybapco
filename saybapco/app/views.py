@@ -98,9 +98,10 @@ class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
     label_columns = {
         'pretty_revision': 'Rev.',
-        'pretty_date': 'Date'
+        'pretty_date': 'Date',
+        'pretty_date_trs': 'TR Date'
     }
-    list_columns = ['pretty_revision', 'trasmittal', 'pretty_date', 'note', 'file_name', 'download']
+    list_columns = ['pretty_revision', 'trasmittal','pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']

@@ -109,6 +109,9 @@ class Revisions(AuditMixin, Model):
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
     
+    def pretty_date_trs(self):
+        return self.date_trs.strftime('%d, %b %Y')
+    
     def pretty_revision(self):
         if self.reply:
             return self.revision +"-Reply"
