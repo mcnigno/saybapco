@@ -116,14 +116,19 @@ class Revisions(AuditMixin, Model):
         if self.reply:
             return self.revision +"-Reply"
         return self.revision
+    
+    def pretty_doc_revision(self):
+        if self.reply:
+            return str(self.document) + ' '+self.revision +"-Reply" 
+        return str(self.document) + ' ' + self.revision
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
     id_c = Column(Integer)
-    style = Column(String(30), default='no type')
-    author = Column(String(100), default='no author')
-    comment = Column(String(500), default='no comment')
-    reply = Column(String(500), default='no reply')
+    style = Column(String(300), default='no type')
+    author = Column(String(1000), default='no author')
+    comment = Column(String(5000), default='no comment')
+    reply = Column(String(5000), default='no reply')
     included = Column(Boolean, default=False)
     closed = Column(Boolean, default=False)
     type_reply = Column(Boolean, default=False)
@@ -133,7 +138,7 @@ class Comments(AuditMixin, Model):
     revision = relationship(Revisions, backref='comments')
     page = Column(String(30), default ='-' )
     partner = Column(String(3), nullable=False)
-    note = Column(String(250))
+    note = Column(String(1500))
 
     def __repr__(self):
         return self.comment
@@ -177,7 +182,8 @@ class Comments(AuditMixin, Model):
     
     def pretty_revision(self):
         try:
-            return self.revision.revision
+            #return self.revision.revision
+            return str(self.revision)
         except:
             pass
 

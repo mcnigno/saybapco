@@ -38,9 +38,9 @@ def comments(item):
     type_reply = False
 
     try:
-        print('Reply identification: ', filename[-8:-5] )
         #if filename[26:29] == "REP":
         if filename[-8:-5] == "REP":
+            print('Reply identification: ', filename[-8:-5] )
             type_reply = True
     except:
         pass
@@ -55,10 +55,13 @@ def comments(item):
 
     revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
     #revision = session.query(revisions).filter(revisions.id == item.id).first()
-
+    session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
     try:
         print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+        comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
+        print('the comments len is:', len(comm_list))
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+        print('delete query executed')
     except:
         print('some problem here')
         pass
@@ -67,7 +70,7 @@ def comments(item):
     #session.commit()
     #check columns label
     #for row in ws.iter_colum()
-    
+    #print('document id', item.document_id,'revision:', item.id)
     partner = item.partner
     #revision = item.revision
 
@@ -104,6 +107,7 @@ def comments(item):
                     included = False
                                 
                 print('before comment')
+                print('document id', item.document_id,'revision:', item.id)
                 comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
@@ -117,7 +121,8 @@ def comments(item):
                 print('something is None')
                 pass
     
-        session.commit()
+    session.commit()
+    
     return 'done'
 
 def check_Doc(self, item):
@@ -144,10 +149,11 @@ def check_Doc(self, item):
         session.add(document)
 
         session.flush()
+        session.commit()
 
         return document.id, document.partner
     
-
+    
 def check_reply(self, item):
     filename = get_file_original_name(item.file)
     try:
@@ -159,4 +165,4 @@ def check_reply(self, item):
         return False
     
     
-    
+

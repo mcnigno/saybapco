@@ -101,13 +101,22 @@ class RevisionView(ModelView):
         'pretty_date': 'Date',
         'pretty_date_trs': 'TR Date'
     }
-    list_columns = ['pretty_revision', 'trasmittal','pretty_date_trs', 'note', 'file_name', 'download']
+    list_columns = ['pretty_doc_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
     show_exclude_columns = ['comments']
 
     related_views = [CommentView]
+
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
 
     def pre_add(self,item):
         item.document_id, item.partner = check_Doc(self, item)
@@ -138,8 +147,16 @@ class DocumentView(ModelView):
         'count_open': 'Open',
         'count_no_reply': "No Reply",
     }
-    list_columns = ['name','partner', 'revision', 'count', 'count_open','count_no_reply', 'count_closed', 'count_included']
-
+    list_columns = ['name','partner', 'revision', 'count', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
+    
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
 
 """
     Application wide 404 error handler
@@ -153,6 +170,8 @@ def page_not_found(e):
 
 
 db.create_all()
+from mass_update import mass_update
+
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
@@ -160,3 +179,6 @@ appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Co
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
+
+
+#mass_update()
