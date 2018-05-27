@@ -119,8 +119,8 @@ class Revisions(AuditMixin, Model):
     
     def pretty_doc_revision(self):
         if self.reply:
-            return str(self.document) + ' '+self.revision +"-Reply" 
-        return str(self.document) + ' ' + self.revision
+            return str(self.document) 
+        return str(self.document)
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
@@ -169,6 +169,10 @@ class Comments(AuditMixin, Model):
     def doc(self):
         
         return str(self.document)
+
+    def pretty_partner(self):
+        
+        return str(self.document.partner)
     
     def pretty_comment(self):
         return self.comment[:75]

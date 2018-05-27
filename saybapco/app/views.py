@@ -3,10 +3,10 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc, check_reply
+from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
-from flask_appbuilder import action
+from flask_appbuilder import action, has_access
 from flask_appbuilder.filemanager import get_file_original_name
 
 
@@ -21,7 +21,7 @@ from flask_appbuilder.filemanager import get_file_original_name
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['included','closed', 'document','revision', 'reply']
+    #search_columns = ['included','closed', 'document','revision', 'reply']
     base_order = ('id_c','asc')
     order_columns = ['id_c']
     label_columns = {
@@ -32,9 +32,12 @@ class CommentView(ModelView):
         'pretty_comment': 'Comments',
         'pretty_reply': 'Replies',
         'pretty_revision': 'Rev',
+        'pretty_partner': 'Partner',
+
         'id_c': 'ID-C',
     }
-    list_columns = ['document','id_c','partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    list_columns = ['document','pretty_revision','pretty_style', 'pretty_comment','note',  'pretty_reply', 'pretty_included','pretty_closed']
 
     #list_widget = ListThumbnail
     
@@ -49,6 +52,18 @@ class CommentView(ModelView):
             self.update_redirect()
         else:
             self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+    @has_access
+    @action("close", "Close", "Close all Really?", "fa-rocket")
+    def close(self, items):
+        if isinstance(items, list):
+            for item in items:
+                item.closed = True
+                self.datamodel.edit(item)
+            self.update_redirect()
+        else:
+            items.closed = True
+            self.datamodel.edit(item)
         return redirect(self.get_redirect())
 
 class CommentsChart(GroupByChartView):
@@ -98,10 +113,12 @@ class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
     label_columns = {
         'pretty_revision': 'Rev.',
+        'pretty_doc_revision': 'Document',
         'pretty_date': 'Date',
-        'pretty_date_trs': 'TR Date'
+        'pretty_date_trs': 'Trans. Date',
+        'trasmittal': 'Transmittal'
     }
-    list_columns = ['pretty_doc_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
+    list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
@@ -171,7 +188,7 @@ def page_not_found(e):
 
 db.create_all()
 from mass_update import mass_update
-
+appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
@@ -182,3 +199,6 @@ appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branc
 
 
 #mass_update()
+#set_comments_blank()
+set_comments_included()
+

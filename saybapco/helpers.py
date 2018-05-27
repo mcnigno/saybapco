@@ -164,5 +164,62 @@ def check_reply(self, item):
     except:
         return False
     
-    
 
+def set_comments_blank():
+    comment = models.Comments
+    revision = models.Revisions
+    document = models.Document
+    
+    session = db.session
+
+    revision_reply = session.query(revision).filter(revision.reply == True).all()
+    print('the number of revisions in reply is:', len(revision_reply))
+    for rev in revision_reply:
+        #session = db.session
+        comments_reply = rev.comments
+
+    
+        print('the number of comments in reply is:', len(comments_reply))
+
+        for comment in comments_reply:
+            print('id\t', comment.id, 'autho\t', comment.author, '\tcomm', comment.comment[:15])
+            if comment.reply == ' ' and comment.comment == ' ':
+                comment.note = 'No comment AND No replies'
+                comment.changed_by_fk = '1'
+                
+                print('*************   NO Comment AND NO Reply   *************')
+            session.commit()
+
+def set_comments_included():
+    comment = models.Comments
+    revision = models.Revisions
+    document = models.Document
+    
+    session = db.session
+
+    # Take only revisions in reply
+    revision_reply = session.query(revision).filter(revision.reply == True).all()
+    print('the number of revisions in reply is:', len(revision_reply))
+    
+    # for every revision take the comments
+    
+    for rev in revision_reply:
+
+        comments_reply = rev.comments
+    
+        print('the number of comments in reply is:', len(comments_reply))
+
+        # for every comments do things
+
+        for comment in comments_reply:
+            print('id\t', comment.id, 'autho\t', comment.author, '\tcomm', comment.comment[:15])
+            
+            # At this Conditions
+            
+            if comment.included:
+                comment.closed = True
+                
+                comment.changed_by_fk = '1'
+                
+                print('*************   Comment Included --> Closed   *************')
+            session.commit()
