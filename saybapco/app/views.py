@@ -8,6 +8,7 @@ from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, 
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
 from flask_appbuilder.filemanager import get_file_original_name
+from mass_update import transmittall
 
 
 
@@ -200,5 +201,5 @@ appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branc
 
 #mass_update()
 #set_comments_blank()
-set_comments_included()
-
+#set_comments_included()
+#transmittall()

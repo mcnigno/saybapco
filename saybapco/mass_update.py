@@ -5,10 +5,54 @@ import uuid, openpyxl
 from helpers import sanetext
 errors_list = set()
 
+def transmittall():
+    report = open('/Users/danilo/python/saybapco/saybapco/report/Report.xlsx', mode='rb')
+    wb = openpyxl.load_workbook(report)
+    ws = wb.active
+
+    report_bapco = open('/Users/danilo/python/saybapco/saybapco/report/Report_by_BAPCO.xlsx', mode='rb')
+    bb = openpyxl.load_workbook(report_bapco)
+    bs = bb.active
+    
+    document = models.Document
+    document_l = db.session.query(document).all()
+
+    for doc in document_l:
+        code = '-'.join([doc.unit, doc.materialclass, doc.doctype, doc.serial, doc.sheet])
+        for rev in doc.revision:
+
+            #print(code, '*', rev)
+
+            for row in ws.iter_rows(min_row=2):
+                #print('------------')
+                #print(row[2].value, code)
+                #print(row[4].value, rev)
+                if row[2].value == code and row[4].value == str(rev):
+                    print('TRANSMITTAL')   
+
+                    bapco_code = row[2].value
+                    revision = row[4].value
+                    bapco_transmittal = row[0].value
+
+                    for nrow in bs.iter_rows(min_row=2):
+                        if bapco_transmittal == nrow[3].value[6:]:
+                            print('transmittal')
+                            print(code)
+                            print(nrow[3].value[6:])
+                            print(nrow[0].value)
+                            trans = nrow[0].value
+                            date = nrow[1].value
+                            revisions = models.Revisions
+                            #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
+                            rev.trasmittal = trans
+                            rev.changed_by_fk = '1'
+                            rev.date_trs = date
+                    db.session.commit() 
+
 def comments(item):
 
     print('file processed:', str(item.file))
-    file = open('/Users/danilo/python/saybapco/saybapco/CS_OLD/' + str(item.file), mode='rb')
+    file = open('/Users/danilo/python/saybapco/saybapco/CS_OLD2/' + str(item.file), mode='rb')
     #print('file processed:', file)
 
     #file = open('/Users/dp/py3/saybapco/saybapco/comments/019-C-GAD-10010-001-RAP-CS REPLY.xlsx', mode='rb')
@@ -89,16 +133,16 @@ def comments(item):
                 
 
 
-                if closed == 'Y':
+                if closed == 'Y' or closed == 'y':
                     closed = True
                 else:
                     closed = False
                 
-                if included == 'Y':
+                if included == 'Y' or included == 'y':
                     included = True
                 else:
                     included = False
-                                
+
                 print('before comment')
                 print('document id', item.document_id,'revision:', item.id)
                 comm = comments(created_by_fk = 1, changed_by_fk = 1, id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
@@ -151,7 +195,7 @@ def check_Doc(item):
 
 
 def mass_update():
-    os.chdir('CS_OLD')
+    os.chdir('CS_OLD2')
 
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
