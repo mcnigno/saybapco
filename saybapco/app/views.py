@@ -199,7 +199,7 @@ appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", cat
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 
 
-mass_update()
+#mass_update()
 #set_comments_blank()
 #set_comments_included()
 #transmittall()
