@@ -6,11 +6,11 @@ from helpers import sanetext
 errors_list = set()
 
 def transmittall():
-    report = open('/Users/danilo/python/saybapco/saybapco/report/Report.xlsx', mode='rb')
+    report = open('/home/danilo/saybapco/saybapco/report/Report.xlsx', mode='rb')
     wb = openpyxl.load_workbook(report)
     ws = wb.active
 
-    report_bapco = open('/Users/danilo/python/saybapco/saybapco/report/Report_by_BAPCO.xlsx', mode='rb')
+    report_bapco = open('/home/danilo/saybapco/saybapco/report/Report_by_BAPCO.xlsx', mode='rb')
     bb = openpyxl.load_workbook(report_bapco)
     bs = bb.active
     
@@ -52,7 +52,7 @@ def transmittall():
 def comments(item):
 
     print('file processed:', str(item.file))
-    file = open('/Users/danilo/python/saybapco/saybapco/CS_OLD2/' + str(item.file), mode='rb')
+    file = open('/home/danilo/saybapco/saybapco/CS_OLD2/' + str(item.file), mode='rb')
     #print('file processed:', file)
 
     #file = open('/Users/dp/py3/saybapco/saybapco/comments/019-C-GAD-10010-001-RAP-CS REPLY.xlsx', mode='rb')
