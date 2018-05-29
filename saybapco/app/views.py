@@ -202,4 +202,4 @@ appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branc
 #mass_update()
 #set_comments_blank()
 #set_comments_included()
-transmittall()
+#transmittall()
