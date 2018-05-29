@@ -22,7 +22,7 @@ from mass_update import transmittall
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    #search_columns = ['included','closed', 'document','revision', 'reply']
+    search_columns = ['included','closed', 'document','revision', 'reply']
     base_order = ('id_c','asc')
     order_columns = ['id_c']
     label_columns = {
