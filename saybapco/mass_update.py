@@ -47,6 +47,7 @@ def transmittall():
                             rev.trasmittal = trans
                             rev.changed_by_fk = '1'
                             rev.date_trs = date
+                            doc.changed_by_fk = '1'
                             doc.partner = trans[4:7]
                     db.session.commit() 
 
