@@ -216,7 +216,7 @@ def mass_update():
                 print(file_sec)
                 file_byte = open(file, mode='rb') 
                 #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_sec, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_byte, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file) 
                 #new_rev.revision = revision
                 
