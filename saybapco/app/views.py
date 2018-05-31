@@ -8,8 +8,9 @@ from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, 
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
 from flask_appbuilder.filemanager import get_file_original_name
-from mass_update import transmittall
-
+from mass_update import transmittall, report_all
+from flask import request, send_file
+from config import UPLOAD_FOLDER
 
 
 #
@@ -18,7 +19,27 @@ from mass_update import transmittall
 #    @expose('/upload', methods=('POST','GET'))
 #    def upload(self):
 #        return self.render_template('upload.html')
-
+class Report(BaseView):
+    @expose('/report/', methods=['POST', 'GET'])
+    def report(self):
+        print('report')
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+    
+        return self.render_template('reports.html')
+    
+    @expose('/forward/', methods=['POST', 'GET'])
+    def forward(self):
+        print('forward')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('forward')
+            print('forward')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
@@ -182,7 +203,7 @@ class DocumentView(ModelView):
 
 @appbuilder.app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
+    return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404##
 
 
 
@@ -192,12 +213,14 @@ from mass_update import mass_update
 appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+#appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
-
+appbuilder.add_view_no_menu(Report)
 
 #mass_update()
 #set_comments_blank()

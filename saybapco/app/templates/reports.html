@@ -1,0 +1,35 @@
+{% extends "appbuilder/base.html" %}
+{% block content %}
+
+<div class="jumbotron" style="text-align:center">
+  <div class="container">
+    <p><img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64"></p>
+    <h1>{{_("Report")}}</h1>
+    <h2>{{_("Comments Management Tool by QuasarPM.com")}}</h2>
+    <p>{{_("Manage comments for Bapco")}}</p>
+
+    <form action="/report/" method="POST" class="form" value="first report">
+
+      <div class="fallback">
+          <input type="submit" value="report 1" name='name' class="btn btn-success"/>button
+      </div>
+      <br>
+    <br>
+    </form>
+    <form action="/report/forward/" method="post">
+        <button class="btn btn-success" name="forwardBtn" type="submit">Forward</button>
+    </form>
+    <br>
+
+    <br>
+    </form>
+    <form action="/report/second/" method="post">
+        <button class="btn btn-success" name="forwardBtn" type="submit">Forward</button>
+    </form>
+    <br>
+
+  </div>
+</div>
+
+
+{% endblock %}

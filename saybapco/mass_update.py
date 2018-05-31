@@ -1,16 +1,65 @@
-import glob, os
+import glob, os, shutil, uuid
 from app import models, db
 from flask_appbuilder import filemanager
 import uuid, openpyxl
 from helpers import sanetext
+from config import UPLOAD_FOLDER
+from flask_appbuilder.filemanager import get_file_original_name
+import openpyxl
+from flask import send_file
+from config import UPLOAD_FOLDER
+
 errors_list = set()
 
+def report_all():
+    filepath = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
+    workbook = openpyxl.load_workbook(filepath)
+    
+    comment = models.Comments
+    revision = models.Revisions
+    document = models.Document
+
+    wc = workbook['Comments']    
+    wr = workbook['Revisions']
+    wd = workbook['Documents']
+
+    comments = db.session.query(comment).all()
+    
+    row = 1
+    col = 1 
+
+    for comment in comments:
+        _ = wc.cell(column=1, row=row, value=str(comment.id))
+        _ = wc.cell(column=2, row=row, value=str(comment.partner))
+        _ = wc.cell(column=3, row=row, value=str(comment.document))
+        _ = wc.cell(column=4, row=row, value=str(comment.revision))
+        _ = wc.cell(column=5, row=row, value=str(comment.included))
+        _ = wc.cell(column=5, row=row, value=str(comment.closed))
+
+        row += 1
+        
+
+
+    #for col in wc.iter_cols(min_row=1, max_col=3, max_row=3):
+        #for cell in col:
+            #cell.value = 'hello world'
+    workbook.save(filepath) 
+
+    
+    
+    
+    file = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
+    #print(file.name)
+    return file
+    
+
+
 def transmittall():
-    report = open('/home/danilo/saybapco/saybapco/report/Report.xlsx', mode='rb')
+    report = open(UPLOAD_FOLDER + 'report/Report.xlsx', mode='rb')
     wb = openpyxl.load_workbook(report)
     ws = wb.active
 
-    report_bapco = open('/home/danilo/saybapco/saybapco/report/Report_by_BAPCO.xlsx', mode='rb')
+    report_bapco = open(UPLOAD_FOLDER + 'report/Report_by_BAPCO.xlsx', mode='rb')
     bb = openpyxl.load_workbook(report_bapco)
     bs = bb.active
     
@@ -54,7 +103,8 @@ def transmittall():
 def comments(item):
 
     print('file processed:', str(item.file))
-    file = open('/home/danilo/saybapco/saybapco/CS_OLD2/' + str(item.file), mode='rb')
+    file = open(UPLOAD_FOLDER + 'CS_OLD2/' + get_file_original_name(item.file), mode='rb')
+    
     #print('file processed:', file)
 
     #file = open('/Users/dp/py3/saybapco/saybapco/comments/019-C-GAD-10010-001-RAP-CS REPLY.xlsx', mode='rb')
@@ -214,9 +264,22 @@ def mass_update():
             if rev[1] == revision and cs != 'CS REP':
                 file_sec = filemanager.secure_filename(file)
                 print(file_sec)
-                file_byte = open(file, mode='rb') 
+                file_byte = open(file)
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+
+                if os.path.exists(file):
+                    src = os.path.realpath(file)
+                
+                    #head, tail = os.path.split(src)
+
+                    dst = UPLOAD_FOLDER + file_uuid
+
+                    shutil.copy(src, dst)
+
+
+                print('FILE BYTE', file_byte) 
                 #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_byte, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file) 
                 #new_rev.revision = revision
                 
@@ -234,13 +297,13 @@ def mass_update():
             _, _, _, _, _, rev, cs = file.split('-')
             cs = cs[:-5]
             if rev[1] == revision and cs == 'CS REP':
-                file_sec = file
+                file_sec = filemanager.secure_filename(file)
                 print(file_sec)
                 file_byte = open(file, mode='rb') 
                 #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_sec, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file) 
-                new_rev.revision = revision
+                #new_rev.revision = revision
                 new_rev.reply = True
 
                 db.session.add(new_rev)

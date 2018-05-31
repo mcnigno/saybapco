@@ -95,7 +95,7 @@ class Revisions(AuditMixin, Model):
 
     def __repr__(self):
         if self.reply:
-            return self.revision +"-Reply"
+            return self.revision +"-Reply"  
         return self.revision
 
     def file_name(self):
