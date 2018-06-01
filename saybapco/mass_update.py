@@ -23,6 +23,11 @@ def report_all():
     wr = workbook['Revisions']
     wd = workbook['Documents']
 
+    # 
+    # Populate Comments Sheet
+    #
+
+    
     comments = db.session.query(comment).all()
     
     row = 1
@@ -34,7 +39,49 @@ def report_all():
         _ = wc.cell(column=3, row=row, value=str(comment.document))
         _ = wc.cell(column=4, row=row, value=str(comment.revision))
         _ = wc.cell(column=5, row=row, value=str(comment.included))
-        _ = wc.cell(column=5, row=row, value=str(comment.closed))
+        _ = wc.cell(column=6, row=row, value=str(comment.closed))
+
+        row += 1
+
+    # 
+    # Populate revisions Sheet
+    #
+
+    
+    revisions = db.session.query(revision).all()
+    
+    row = 1
+    col = 1 
+
+    for revision in revisions:
+        _ = wr.cell(column=1, row=row, value=str(revision.id))
+        _ = wr.cell(column=2, row=row, value=str(revision.file))
+        _ = wr.cell(column=3, row=row, value=str(revision.revision))
+        _ = wr.cell(column=4, row=row, value=str(revision.trasmittal))
+        _ = wr.cell(column=5, row=row, value=str(revision.date_trs))
+        _ = wr.cell(column=6, row=row, value=str(revision.document))
+        _ = wr.cell(column=7, row=row, value=str(revision.reply))
+
+        row += 1
+
+    # 
+    # Populate documents Sheet
+    #
+
+    
+    documents = db.session.query(document).all()
+    
+    row = 1
+    col = 1 
+
+    for document in documents:
+        _ = wd.cell(column=1, row=row, value=str(document.id))
+        _ = wd.cell(column=2, row=row, value=str(document.name))
+        _ = wd.cell(column=3, row=row, value=str(document.partner))
+        _ = wd.cell(column=4, row=row, value=str(document.revision))
+        _ = wd.cell(column=5, row=row, value=str(document.count_open()))
+        
+        
 
         row += 1
         
