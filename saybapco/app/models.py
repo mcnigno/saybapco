@@ -34,6 +34,7 @@ class Document(AuditMixin, Model):
     serial = Column(String(5), nullable=False)
     partner = Column(String(3), nullable=False)
     sheet = Column(String(3))
+    closed = Column(Boolean, default=False)
 
     def __repr__(self):
         name = '-'.join([self.unit, self.materialclass,
@@ -50,6 +51,9 @@ class Document(AuditMixin, Model):
     
     def revision(self):
         return str(self.revision)
+
+    
+    
     
     def count(self):
         return len(self.comments)
@@ -81,6 +85,13 @@ class Document(AuditMixin, Model):
     
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
+    
+    def is_closed(self):
+        for com in self.comments:
+            if com.closed == False:
+                return False
+        #self.closed = True
+        return True
 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
@@ -121,6 +132,8 @@ class Revisions(AuditMixin, Model):
         if self.reply:
             return str(self.document) 
         return str(self.document)
+    
+    
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
@@ -192,6 +205,5 @@ class Comments(AuditMixin, Model):
             pass
 
     def open_comments(self):
-        if self.closed == True:
-            return False
-        return True
+        
+        return self.closed

@@ -2,6 +2,9 @@ import openpyxl, re
 from config import UPLOAD_FOLDER
 from app import db, models
 from flask_appbuilder.filemanager import get_file_original_name
+from openpyxl.styles import Font, Color
+from openpyxl.worksheet.table import Table, TableStyleInfo
+import uuid
 
 
 def parse_escaped_character_match(match):
@@ -16,6 +19,8 @@ def sanetext(input_string):
 #
 #  Add Revisions uploading a Comment file by Bluebin.
 #
+
+
 
 
 def comments(item):
@@ -141,6 +146,7 @@ def check_Doc(self, item):
                                  doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
+        
         return document.id, document.partner
     else:
         document = doc(unit=unit, materialclass=mat, doctype=doctype, 
@@ -163,7 +169,22 @@ def check_reply(self, item):
             return True
     except:
         return False
+
+def check_doc_closed(doc_id):
+    doc = models.Document
+    document = db.session.query(doc).filter(doc.id==doc_id).first()
+    print('Check Doc Function')
     
+    closed = True
+    for com in document.comments:
+        
+        if com.closed == False:
+            closed = False
+            break
+        print('comment closed:',com, com.closed)
+    document.closed = closed
+    document.changed_by_fk = '1'
+    db.session.commit()
 
 def set_comments_blank():
     comment = models.Comments
@@ -222,4 +243,150 @@ def set_comments_included():
                 comment.changed_by_fk = '1'
                 
                 print('*************   Comment Included --> Closed   *************')
+            
+            if comment.reply != ' ' and comment.included == False:
+                comment.closed = True
+                
+                comment.changed_by_fk = '1'
+                
+                print('*************   Comment Included --> Closed   *************')
             session.commit()
+
+def report_all():
+    file_template = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
+    filepath = UPLOAD_FOLDER + 'report/' + str(uuid.uuid4()) + 'cs_dashboard.xlsx'
+    workbook = openpyxl.load_workbook(file_template)
+    
+    comment = models.Comments
+    revision = models.Revisions
+    document = models.Document
+
+    wc = workbook['Comments']    
+    wr = workbook['Revisions']
+    wd = workbook['Documents']
+
+    # 
+    # Styles
+    #
+
+    ft = Font(bold=True, color='4b1f68')
+
+    # 
+    # Populate Comments Sheet
+    #
+
+    '''
+    comments = db.session.query(comment).all()
+    
+    row = 1
+    col = 1 
+
+    for comment in comments:
+        print('comments *********************')
+        _ = wc.cell(column=1, row=row, value=str(comment.id))
+        _ = wc.cell(column=2, row=row, value=str(comment.partner))
+        _ = wc.cell(column=3, row=row, value=str(comment.document))
+        _ = wc.cell(column=4, row=row, value=str(comment.revision))
+        _ = wc.cell(column=5, row=row, value=str(comment.included))
+        _ = wc.cell(column=6, row=row, value=str(comment.closed))
+
+        row += 1
+    '''
+
+    # 
+    # Populate revisions Sheet
+    #
+
+    
+    revisions = db.session.query(revision).all()
+    
+    row = 1
+    col = 1 
+
+    for revision in revisions:
+        _ = wr.cell(column=1, row=row, value=str(revision.id))
+        _ = wr.cell(column=2, row=row, value=str(revision.file))
+        _ = wr.cell(column=3, row=row, value=str(revision.revision))
+        _ = wr.cell(column=4, row=row, value=str(revision.trasmittal))
+        _ = wr.cell(column=5, row=row, value=str(revision.date_trs))
+        _ = wr.cell(column=6, row=row, value=str(revision.document))
+        _ = wr.cell(column=7, row=row, value=str(revision.reply))
+
+        row += 1
+
+    # 
+    # Populate documents Sheet
+    #
+
+    # 
+    # Set the labels for the document sheet
+    #
+    
+    documents = db.session.query(document).all()
+    
+    
+    _ = wd.cell(column=1, row=1, value='ID')
+    _.font = ft
+    _ = wd.cell(column=2, row=1, value='Bapco Code')
+    _.font = ft
+    _ = wd.cell(column=3, row=1, value='Partner')
+    _.font = ft
+    _ = wd.cell(column=4, row=1, value='Revisions')
+    _.font = ft
+    _ = wd.cell(column=5, row=1, value='Open CS')
+    _.font = ft
+    
+    
+
+    # 
+    # Set the rows for the document sheet
+    #
+    
+    row = 2
+    
+
+    for document in documents:
+        doc = [document.id, document.name(), document.partner, str(document.revision), document.count_open()]
+        wd.append(doc)
+        
+        '''
+        _ = wd.cell(column=1, row=row, value=str(document.id))
+        _ = wd.cell(column=2, row=row, value=str(document.name()))
+        _ = wd.cell(column=3, row=row, value=str(document.partner))
+        _ = wd.cell(column=4, row=row, value=str(document.revision))
+        _ = wd.cell(column=5, row=row, value=str(document.count_open()))
+        '''
+        
+
+        row += 1
+    wd.page_setup.fitToWidth = 1
+    
+    tab = Table(displayName='Documents', ref='A1:E'+ str(row))
+    style = TableStyleInfo(name='TableStyleMedium9')
+    tab.tableStyleInfo = style
+    #wd.add_table(tab)
+    
+    workbook.save(filepath) 
+    
+    file = filepath
+    #print(file.name)
+    return file
+
+def check_doc_closed2():
+    doc = models.Document
+    documents = db.session.query(doc).all()
+    
+    for document in documents:
+
+        print('Check Doc Function')
+        closed = True
+        for com in document.comments:
+            
+            if com.closed == False:
+                closed = False
+                break
+            print('comment closed:',com, com.closed)
+        document.closed = closed
+        document.changed_by_fk = '1'
+        db.session.commit()
+        #return True

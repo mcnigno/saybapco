@@ -11,6 +11,23 @@ from config import UPLOAD_FOLDER
 
 errors_list = set()
 
+def test_closed(doc_id):
+    doc = models.Document
+    document = db.session.query(doc).filter(doc.id==doc_id).first()
+    print('Check Doc Function')
+    
+    closed = True
+    for com in document.comments:
+        
+        if com.closed == False:
+            closed = False
+            break
+        print('comment closed:',com, com.closed)
+    print('comment closed:',com, com.closed)
+    document.closed = closed
+    print('document closed?', document.closed)
+    document.changed_by_fk = '1'
+    db.session.commit()
 def report_all():
     filepath = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(filepath)
@@ -27,13 +44,14 @@ def report_all():
     # Populate Comments Sheet
     #
 
-    
+    '''
     comments = db.session.query(comment).all()
     
     row = 1
     col = 1 
 
     for comment in comments:
+        print('comments *********************')
         _ = wc.cell(column=1, row=row, value=str(comment.id))
         _ = wc.cell(column=2, row=row, value=str(comment.partner))
         _ = wc.cell(column=3, row=row, value=str(comment.document))
@@ -42,7 +60,7 @@ def report_all():
         _ = wc.cell(column=6, row=row, value=str(comment.closed))
 
         row += 1
-
+    '''
     # 
     # Populate revisions Sheet
     #
@@ -71,12 +89,17 @@ def report_all():
     
     documents = db.session.query(document).all()
     
-    row = 1
+    row = 2
     col = 1 
+    _ = wd.cell(column=1, row=1, value='ID')
+    _ = wd.cell(column=2, row=1, value='Bapco Code')
+    _ = wd.cell(column=3, row=1, value='Partner')
+    _ = wd.cell(column=4, row=1, value='Revisions')
+    _ = wd.cell(column=5, row=1, value='Open CS')
 
     for document in documents:
         _ = wd.cell(column=1, row=row, value=str(document.id))
-        _ = wd.cell(column=2, row=row, value=str(document.name))
+        _ = wd.cell(column=2, row=row, value=str(document.name()))
         _ = wd.cell(column=3, row=row, value=str(document.partner))
         _ = wd.cell(column=4, row=row, value=str(document.revision))
         _ = wd.cell(column=5, row=row, value=str(document.count_open()))
@@ -166,7 +189,7 @@ def comments(item):
     doctype = filename[6:9]
     serial = filename[10:15]
     type_reply = False
-
+    print('Reply identification: ', filename[-8:-5] )
     try:
         #if filename[26:29] == "REP":
         if filename[-8:-5] == "REP":
@@ -230,14 +253,13 @@ def comments(item):
 
                 print(id_c, style, author)
                 
-
-
-                if closed == 'Y' or closed == 'y':
+                yes = ['Y','y','Yes','YES']
+                if closed in yes:
                     closed = True
                 else:
                     closed = False
                 
-                if included == 'Y' or included == 'y':
+                if included in yes:
                     included = True
                 else:
                     included = False
@@ -263,6 +285,23 @@ def comments(item):
     print(errors_list)
     return 'done'
 
+def check_doc_closed(doc_id):
+    doc = models.Document
+    document = db.session.query(doc).filter(doc.id==doc_id).first()
+    print('Check Doc Function')
+    closed = True
+    try:
+        for com in document.comments:
+            print(com, com.closed)
+            if com.closed == False:
+                closed = False
+                break
+            print('comment closed:',com, com.closed)
+    except:
+        closed = False
+    document.closed = closed
+    document.changed_by_fk = '1'
+    db.session.commit()
 
 def check_Doc(item):
     filename = item
@@ -280,6 +319,7 @@ def check_Doc(item):
                                  doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
+        
         return document.id, document.partner
     else:
         document = doc(created_by_fk = 1, changed_by_fk = 1, unit=unit, materialclass=mat, doctype=doctype, 
@@ -294,7 +334,7 @@ def check_Doc(item):
 
 
 def mass_update():
-    os.chdir('CS_OLD2')
+    os.chdir(UPLOAD_FOLDER +'CS_OLD2')
 
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
@@ -306,7 +346,7 @@ def mass_update():
             
             _, _, _, _, _, rev, cs = file.split('-')
             cs = cs[:-5]
-            #print('rev:', rev,'cs:', cs)
+            print('rev:', rev,'cs:', cs)
             
             if rev[1] == revision and cs != 'CS REP':
                 file_sec = filemanager.secure_filename(file)
@@ -327,7 +367,8 @@ def mass_update():
                 print('FILE BYTE', file_byte) 
                 #filemanager.FileManager.save_file(file_byte, file_sec)
                 new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                new_rev.document_id, new_rev.partner = check_Doc(file) 
+                new_rev.document_id, new_rev.partner = check_Doc(file)
+                 
                 #new_rev.revision = revision
                 
                 db.session.add(new_rev)
@@ -335,6 +376,7 @@ def mass_update():
 
                 db.session.flush()
                 comments(new_rev)
+                check_doc_closed(new_rev.document_id)
 
                 print(file)
         db.session.commit()
@@ -345,11 +387,15 @@ def mass_update():
             cs = cs[:-5]
             if rev[1] == revision and cs == 'CS REP':
                 file_sec = filemanager.secure_filename(file)
+                print('******************* REPLY')
                 print(file_sec)
                 file_byte = open(file, mode='rb') 
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
                 #filemanager.FileManager.save_file(file_byte, file_sec)
                 new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file) 
+                print('the new rev id is:', new_rev.document_id)
+                 
                 #new_rev.revision = revision
                 new_rev.reply = True
 
@@ -358,6 +404,7 @@ def mass_update():
 
                 db.session.flush()
                 comments(new_rev)
+                check_doc_closed(new_rev.document_id)
 
                 print(file)
         db.session.commit()

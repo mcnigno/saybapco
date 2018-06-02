@@ -3,14 +3,16 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included
+from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
 from flask_appbuilder.filemanager import get_file_original_name
-from mass_update import transmittall, report_all
+from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
+from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
+from mass_update import test_closed
 
 
 #
@@ -87,10 +89,29 @@ class CommentView(ModelView):
             items.closed = True
             self.datamodel.edit(item)
         return redirect(self.get_redirect())
+    def post_update(self, item):
+        check_doc_closed(item.document_id)
+
+'''
+class OpenCommentsView(ModelView):
+    datamodel = SQLAInterface(Comments)
+
+    base_filters = [['type_reply', FilterEqual, True],
+                    ['closed', FilterEqual, False]
+    
+    ]
+'''
 
 class CommentsChart(GroupByChartView):
     datamodel = SQLAInterface(Comments)
     chart_type = 'BarChart'
+    height = '2000px'
+    chart_title = 'Open CS Chart'
+    search_columns = ['type_reply', 'included', 'closed','style']
+    base_filters = [['type_reply', FilterEqual, True],
+                    ['closed', FilterEqual, False]
+    
+    ]
     definitions = [
        
         {
@@ -99,16 +120,16 @@ class CommentsChart(GroupByChartView):
             'series': [
                 (aggregate_count, 'comment'),
                 (aggregate_sum, 'closed'),
-                (aggregate_sum, 'included')             
+                #(aggregate_sum, 'included')             
             ]
         },
         {
             'label': 'Document',
             'group': 'doc',
             'series': [
-                (aggregate_count, 'comment'),
-                (aggregate_sum, 'closed'),
-                (aggregate_sum, 'included'),
+                #(aggregate_count, 'comment'),
+                #(aggregate_sum, 'closed'),
+                #(aggregate_sum, 'included'),
                 (aggregate_count, 'open_comments')             
             ]
         }
@@ -167,7 +188,10 @@ class RevisionView(ModelView):
     def post_add(self, item):
         
         print('post add functions on revision')
+
         comments(item)
+        check_doc_closed(item.document_id)
+
 
 
 class DocumentView(ModelView):
@@ -177,7 +201,7 @@ class DocumentView(ModelView):
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
     search_exclude_columns = ['created_on', 'changed_on']
-    #search_columns = ['name', 'partner' ]
+    search_columns = ['partner', 'serial','closed' ]
     label_columns = {
         'name': 'Bapco Code',
         'count': 'Tot',
@@ -186,7 +210,7 @@ class DocumentView(ModelView):
         'count_open': 'Open',
         'count_no_reply': "No Reply",
     }
-    list_columns = ['name','partner', 'revision', 'count', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
+    list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
     
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -195,6 +219,16 @@ class DocumentView(ModelView):
             self.update_redirect()
         else:
             self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
+    @action("check", "Check", "Check all Really?", "fa-rocket")
+    def check(self, items):
+        if isinstance(items, list):
+            for item in items:
+                test_closed(item.id)
+            self.update_redirect()
+        else:
+            test_closed(items.id)
         return redirect(self.get_redirect())
 
 """
@@ -226,3 +260,6 @@ appbuilder.add_view_no_menu(Report)
 #set_comments_blank()
 #set_comments_included()
 #transmittall()
+
+
+#check_doc_closed2() 
