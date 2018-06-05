@@ -334,80 +334,94 @@ def check_Doc(item):
 
 
 def mass_update():
+    
     os.chdir(UPLOAD_FOLDER +'CS_OLD2')
 
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
+    try:
+        for revision in rev_order:
+            #print('processing Rev:', revision)
+            # Check the revision A ...
+            i = 0
+            for file in glob.glob("*.xlsx"):
+                i += 1
+                print(i, file)
 
-    for revision in rev_order:
-        print('processing Rev:', revision)
-        # Check the revision A ...
-        for file in glob.glob("*.xlsx"):
-            
-            _, _, _, _, _, rev, cs = file.split('-')
-            cs = cs[:-5]
-            print('rev:', rev,'cs:', cs)
-            
-            if rev[1] == revision and cs != 'CS REP':
-                file_sec = filemanager.secure_filename(file)
-                print(file_sec)
-                file_byte = open(file)
-                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-
-                if os.path.exists(file):
-                    src = os.path.realpath(file)
                 
-                    #head, tail = os.path.split(src)
-
-                    dst = UPLOAD_FOLDER + file_uuid
-
-                    shutil.copy(src, dst)
-
-
-                print('FILE BYTE', file_byte) 
-                #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                new_rev.document_id, new_rev.partner = check_Doc(file)
-                 
-                #new_rev.revision = revision
+                _, _, _, _, _, rev, cs = file.split('-')
+                cs = cs[:-5]
+                #print('rev:', rev,'cs:', cs)
                 
-                db.session.add(new_rev)
+                if rev[1] == revision and cs != 'CS REP':
+                    file_sec = filemanager.secure_filename(file)
+                    #print(file_sec)
+                    file_byte = open(file)
+                    file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
 
+                    if os.path.exists(file):
+                        src = os.path.realpath(file)
+                    
+                        #head, tail = os.path.split(src)
 
-                db.session.flush()
-                comments(new_rev)
-                check_doc_closed(new_rev.document_id)
+                        dst = UPLOAD_FOLDER + file_uuid
 
-                print(file)
-        db.session.commit()
-        # Check for the replay
+                        shutil.copy(src, dst)
                 
-        for file in glob.glob("*.xlsx"):
-            _, _, _, _, _, rev, cs = file.split('-')
-            cs = cs[:-5]
-            if rev[1] == revision and cs == 'CS REP':
-                file_sec = filemanager.secure_filename(file)
-                print('******************* REPLY')
-                print(file_sec)
-                file_byte = open(file, mode='rb') 
-                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-                #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                new_rev.document_id, new_rev.partner = check_Doc(file) 
-                print('the new rev id is:', new_rev.document_id)
-                 
-                #new_rev.revision = revision
-                new_rev.reply = True
-
-                db.session.add(new_rev)
 
 
-                db.session.flush()
-                comments(new_rev)
-                check_doc_closed(new_rev.document_id)
+                    #print('FILE BYTE', file_byte) 
+                    #filemanager.FileManager.save_file(file_byte, file_sec)
+                    new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                    new_rev.document_id, new_rev.partner = check_Doc(file)
+                    
+                    #new_rev.revision = revision
+                    
+                    db.session.add(new_rev)
 
-                print(file)
-        db.session.commit()
 
+                    db.session.flush()
+                    comments(new_rev)
+                    check_doc_closed(new_rev.document_id)
+                else:
+                    print('REV NOT FOUND', rev[1], file)
+                    #print(file)
+            db.session.commit()
+            # Check for the replay
+                    
+            for file in glob.glob("*.xlsx"):
+                _, _, _, _, _, rev, cs = file.split('-')
+                cs = cs[:-5]
+                if rev[1] == revision and cs == 'CS REP':
+                    file_sec = filemanager.secure_filename(file)
+                    #print('******************* REPLY')
+                    #print(file_sec)
+                    file_byte = open(file, mode='rb') 
+                    file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+                    #filemanager.FileManager.save_file(file_byte, file_sec)
+                    new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                    new_rev.document_id, new_rev.partner = check_Doc(file) 
+                    #print('the new rev id is:', new_rev.document_id)
+                    
+                    #new_rev.revision = revision
+                    new_rev.reply = True
+
+                    db.session.add(new_rev)
+
+
+                    db.session.flush()
+                    comments(new_rev)
+                    check_doc_closed(new_rev.document_id)
+
+                    #print(file)
+                
+                    print('REV NOT FOUND', rev[1], file)
+            db.session.commit()
+    except:
+        errors_list.add(file)
+        print('error file:', file)
+        pass
+    print('+++++++++  ERROR LIST ++++++++')
+    print(errors_list)
 
 
