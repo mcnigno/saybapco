@@ -262,4 +262,4 @@ appbuilder.add_view_no_menu(Report)
 #transmittall()
 
 
-check_doc_closed2() 
+#check_doc_closed2() 
