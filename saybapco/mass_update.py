@@ -212,13 +212,13 @@ def comments(item):
     
     try:
 
-        print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+        #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
         
         comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
-        print('the comments len is:', len(comm_list))
+        #print('the comments len is:', len(comm_list))
         
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-        print('delete query executed')
+        #print('delete query executed')
     
     except:
 
@@ -251,7 +251,7 @@ def comments(item):
                 closed = sanetext(row[7].value)
 
 
-                print(id_c, style, author)
+                #print(id_c, style, author)
                 
                 yes = ['Y','y','Yes','YES']
                 if closed in yes:
@@ -264,7 +264,7 @@ def comments(item):
                 else:
                     included = False
 
-                print('before comment')
+                #print('before comment')
                 print('document id', item.document_id,'revision:', item.id)
                 comm = comments(created_by_fk = 1, changed_by_fk = 1, id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
@@ -272,7 +272,7 @@ def comments(item):
                 
                 session.add(comm)
 
-                print('after comment')
+                #print('after comment')
             
                 
             except:
@@ -339,88 +339,89 @@ def mass_update():
 
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
-    try:
-        for revision in rev_order:
-            #print('processing Rev:', revision)
-            # Check the revision A ...
-            i = 0
-            for file in glob.glob("*.xlsx"):
-                i += 1
-                print(i, file)
+    
+    for revision in rev_order:
+        #print('processing Rev:', revision)
+        # Check the revision A ...
+        i = 0
+        for file in glob.glob("*.*"):
+            i += 1
+            print(i, file)
 
+            
+            _, _, _, _, _, rev, cs = file.split('-')
+            cs = cs[:-5]
+            #print('rev:', rev,'cs:', cs)
+            
+            if rev[1] == revision and cs != 'CS REP':
+                file_sec = filemanager.secure_filename(file)
+                #print(file_sec)
+                file_byte = open(file)
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+
+                if os.path.exists(file):
+                    src = os.path.realpath(file)
                 
-                _, _, _, _, _, rev, cs = file.split('-')
-                cs = cs[:-5]
-                #print('rev:', rev,'cs:', cs)
+                    #head, tail = os.path.split(src)
+
+                    dst = UPLOAD_FOLDER + file_uuid
+
+                    shutil.copy(src, dst)
+            
+
+
+                #print('FILE BYTE', file_byte) 
+                #filemanager.FileManager.save_file(file_byte, file_sec)
+                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev.document_id, new_rev.partner = check_Doc(file)
                 
-                if rev[1] == revision and cs != 'CS REP':
-                    file_sec = filemanager.secure_filename(file)
-                    #print(file_sec)
-                    file_byte = open(file)
-                    file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-
-                    if os.path.exists(file):
-                        src = os.path.realpath(file)
-                    
-                        #head, tail = os.path.split(src)
-
-                        dst = UPLOAD_FOLDER + file_uuid
-
-                        shutil.copy(src, dst)
+                #new_rev.revision = revision
                 
+                db.session.add(new_rev)
 
 
-                    #print('FILE BYTE', file_byte) 
-                    #filemanager.FileManager.save_file(file_byte, file_sec)
-                    new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                    new_rev.document_id, new_rev.partner = check_Doc(file)
-                    
-                    #new_rev.revision = revision
-                    
-                    db.session.add(new_rev)
-
-
-                    db.session.flush()
-                    comments(new_rev)
-                    check_doc_closed(new_rev.document_id)
-                else:
-                    print('REV NOT FOUND', rev[1], file)
-                    #print(file)
-            db.session.commit()
-            # Check for the replay
-                    
-            for file in glob.glob("*.xlsx"):
-                _, _, _, _, _, rev, cs = file.split('-')
-                cs = cs[:-5]
-                if rev[1] == revision and cs == 'CS REP':
-                    file_sec = filemanager.secure_filename(file)
-                    #print('******************* REPLY')
-                    #print(file_sec)
-                    file_byte = open(file, mode='rb') 
-                    file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-                    #filemanager.FileManager.save_file(file_byte, file_sec)
-                    new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                    new_rev.document_id, new_rev.partner = check_Doc(file) 
-                    #print('the new rev id is:', new_rev.document_id)
-                    
-                    #new_rev.revision = revision
-                    new_rev.reply = True
-
-                    db.session.add(new_rev)
-
-
-                    db.session.flush()
-                    comments(new_rev)
-                    check_doc_closed(new_rev.document_id)
-
-                    #print(file)
+                db.session.flush()
+                comments(new_rev)
+                check_doc_closed(new_rev.document_id)
+            else:
+                print('REV NOT FOUND', rev[1], file)
+                #print(file)
+        db.session.commit()
+        # Check for the replay
                 
-                    print('REV NOT FOUND', rev[1], file)
-            db.session.commit()
-    except:
-        errors_list.add(file)
-        print('error file:', file)
-        pass
+        for file in glob.glob("*.*"):
+            _, _, _, _, _, rev, cs = file.split('-')
+            cs = cs[:-5]
+            if rev[1] == revision and cs == 'CS REP':
+                file_sec = filemanager.secure_filename(file)
+                #print('******************* REPLY')
+                #print(file_sec)
+                file_byte = open(file, mode='rb') 
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+                #filemanager.FileManager.save_file(file_byte, file_sec)
+                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev.document_id, new_rev.partner = check_Doc(file) 
+                #print('the new rev id is:', new_rev.document_id)
+                
+                #new_rev.revision = revision
+                new_rev.reply = True
+
+                db.session.add(new_rev)
+
+
+                db.session.flush()
+                comments(new_rev)
+                check_doc_closed(new_rev.document_id)
+
+                #print(file)
+            
+                #print('REV NOT FOUND', rev[1], file)
+        db.session.commit()
+    db.session.close()
+
+    errors_list.add(file)
+    #print('error file:', file)
+    
     print('+++++++++  ERROR LIST ++++++++')
     print(errors_list)
 
