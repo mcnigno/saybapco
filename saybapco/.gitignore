@@ -7,6 +7,6 @@ app.db
 env
 venv
 *.sublime*
-app/static/uploads/*
+
 .DS_Store
 /.vscode/*
