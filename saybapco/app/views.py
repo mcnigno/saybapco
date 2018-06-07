@@ -62,7 +62,7 @@ class CommentView(ModelView):
     }
     #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
     list_columns = ['document','pretty_revision','pretty_style', 'pretty_comment','note',  'pretty_reply', 'pretty_included','pretty_closed']
-
+    show_exclude_columns = ['partner']
     #list_widget = ListThumbnail
     
     add_exclude_columns = ['created_on', 'changed_on']
