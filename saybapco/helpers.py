@@ -389,4 +389,5 @@ def check_doc_closed2():
         document.closed = closed
         document.changed_by_fk = '1'
         db.session.commit()
+    db.session.close()
         #return True
