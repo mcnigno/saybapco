@@ -45,9 +45,9 @@ class Report(BaseView):
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['included','closed', 'document','revision','comment', 'reply']
-    base_order = ('id_c','asc')
-    order_columns = ['id_c']
+    search_columns = ['document','revision','comment', 'reply', 'included','closed']
+    #base_order = ('document','asc')
+    order_columns = ['document', 'revision', 'id_c']
     label_columns = {
         'pretty_style' : 'Type',
         'pretty_included': 'Included',
@@ -153,6 +153,7 @@ class CommentsPieChart(GroupByChartView):
         ]
 
 class RevisionView(ModelView):
+    order_columns = ['document', 'asc']
     datamodel = SQLAInterface(Revisions)
     label_columns = {
         'pretty_revision': 'Rev.',
@@ -199,11 +200,12 @@ class RevisionView(ModelView):
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
     related_views = [CommentView, RevisionView]
+    order_columns = ['document', 'asc']
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
     search_exclude_columns = ['created_on', 'changed_on']
-    search_columns = ['partner', 'serial','closed' ]
+    search_columns = ['unit', 'materialclass', 'doctype', 'serial', 'partner','closed']
     label_columns = {
         'name': 'Bapco Code',
         'count': 'Tot',
