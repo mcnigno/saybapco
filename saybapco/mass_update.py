@@ -28,6 +28,8 @@ def test_closed(doc_id):
     print('document closed?', document.closed)
     document.changed_by_fk = '1'
     db.session.commit()
+    session.close()
+    
 def report_all():
     filepath = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(filepath)
@@ -119,6 +121,7 @@ def report_all():
     
     
     file = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
+    session.close()
     #print(file.name)
     return file
     
@@ -168,7 +171,8 @@ def transmittall():
                             rev.date_trs = date
                             doc.changed_by_fk = '1'
                             doc.partner = trans[4:7]
-                    db.session.commit() 
+                    db.session.commit()
+    session.close() 
 
 def comments(item):
 
@@ -281,6 +285,7 @@ def comments(item):
                 pass
     
     session.commit()
+    session.close()
     print('list of Errors:')
     print(errors_list)
     return 'done'
@@ -302,6 +307,7 @@ def check_doc_closed(doc_id):
     document.closed = closed
     document.changed_by_fk = '1'
     db.session.commit()
+    session.close()
 
 def check_Doc(item):
     filename = item
@@ -329,6 +335,7 @@ def check_Doc(item):
 
         session.flush()
         session.commit()
+        session.close()
 
         return document.id, document.partner
 

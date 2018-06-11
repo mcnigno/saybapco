@@ -127,6 +127,7 @@ def comments(item):
                 pass
     
     session.commit()
+    session.close()
     
     return 'done'
 
@@ -156,6 +157,7 @@ def check_Doc(self, item):
 
         session.flush()
         session.commit()
+        session.close()
 
         return document.id, document.partner
     
@@ -185,6 +187,7 @@ def check_doc_closed(doc_id):
     document.closed = closed
     document.changed_by_fk = '1'
     db.session.commit()
+    session.close()
 
 def set_comments_blank():
     comment = models.Comments
@@ -210,6 +213,7 @@ def set_comments_blank():
                 
                 print('*************   NO Comment AND NO Reply   *************')
             session.commit()
+    session.close()
 
 def set_comments_included():
     comment = models.Comments
@@ -251,6 +255,7 @@ def set_comments_included():
                 
                 print('*************   Comment Included --> Closed   *************')
             session.commit()
+    session.close()
 
 def report_all():
     file_template = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
@@ -370,6 +375,7 @@ def report_all():
     
     file = filepath
     #print(file.name)
+    session.close()
     return file
 
 def check_doc_closed2():
