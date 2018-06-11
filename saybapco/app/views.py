@@ -161,7 +161,9 @@ class RevisionView(ModelView):
         'pretty_date_trs': 'Trans. Date',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
+    search_columns = ['document','revision', 'reply','trasmittal', 'date_trs' ]
+    list_columns = ['document', 'pretty_revision', 'file_name', 'download']
+    #list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
