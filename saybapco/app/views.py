@@ -163,10 +163,10 @@ class RevisionView(ModelView):
         'trasmittal': 'Transmittal'
     }
     search_columns = ['document','revision', 'reply','trasmittal', 'date_trs' ]
-    list_columns = ['document', 'pretty_revision', 'file_name', 'download']
+    list_columns = ['document', 'pretty_revision', 'pretty_date_trs','trasmittal','file_name', 'download']
     #list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
-    edit_exclude_columns = ['created_on', 'changed_on']
+    edit_exclude_columns = ['created_on', 'changed_on', 'file','comments']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
     show_exclude_columns = ['comments']
 
