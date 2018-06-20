@@ -92,6 +92,11 @@ class Document(AuditMixin, Model):
                 return False
         #self.closed = True
         return True
+    
+    def pretty_closed(self):
+        if self.closed:
+            return "YES"
+        return "NO"
 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)

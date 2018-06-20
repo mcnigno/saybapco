@@ -213,9 +213,10 @@ class DocumentView(ModelView):
         'count_closed': 'Closed',
         'count_open': 'Open',
         'count_no_reply': "No Reply",
+        'pretty_closed' : 'Closed'
     }
-    list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
-    
+    #list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
+    list_columns = ['name','pretty_closed','partner', 'revision', 'count', 'count_open']
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
         if isinstance(items, list):

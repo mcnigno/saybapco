@@ -198,6 +198,7 @@ def set_comments_blank():
 
     revision_reply = session.query(revision).filter(revision.reply == True).all()
     print('the number of revisions in reply is:', len(revision_reply))
+    blank_reply = 0
     for rev in revision_reply:
         #session = db.session
         comments_reply = rev.comments
@@ -206,14 +207,31 @@ def set_comments_blank():
         print('the number of comments in reply is:', len(comments_reply))
 
         for comment in comments_reply:
-            print('id\t', comment.id, 'autho\t', comment.author, '\tcomm', comment.comment[:15])
+            
             if comment.reply == ' ' and comment.comment == ' ':
+                print('id\t', comment.id, 'autho\t', comment.author, '\tcomm', comment.comment[:15])
                 comment.note = 'No comment AND No replies'
                 comment.changed_by_fk = '1'
-                
+                session.delete(comment)
+                blank_reply += 1
                 print('*************   NO Comment AND NO Reply   *************')
+      
             session.commit()
+    
+    comment = models.Comments
+    comment_all = session.query(comment).all()
+    blank = 0
+    for comment in comment_all:
+
+        if comment.comment == ' ':
+            blank += 1
+            print('blank comment')
+            session.delete(comment)
+    session.commit()
+    print('vuoti', blank)
+    print('vuoti in reply', blank_reply)
     session.close()
+    
 
 def set_comments_included():
     comment = models.Comments
@@ -227,7 +245,7 @@ def set_comments_included():
     print('the number of revisions in reply is:', len(revision_reply))
     
     # for every revision take the comments
-    
+    closed_by_included = 0
     for rev in revision_reply:
 
         comments_reply = rev.comments
@@ -243,18 +261,14 @@ def set_comments_included():
             
             if comment.included:
                 comment.closed = True
-                
+                closed_by_included += 1
                 comment.changed_by_fk = '1'
                 
                 print('*************   Comment Included --> Closed   *************')
             
-            if comment.reply != ' ' and comment.included == False:
-                comment.closed = True
-                
-                comment.changed_by_fk = '1'
-                
-                print('*************   Comment Included --> Closed   *************')
+            
             session.commit()
+    print('closed_by_included', closed_by_included)
     session.close()
 
 def report_all():
