@@ -254,16 +254,16 @@ appbuilder.security_cleanup()
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 #appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 
-appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
-appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
+appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comment Sheet", category_icon='fas fa-comment')
+appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comment Sheet", category_icon='fas fa-comment')
+appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comment Sheet", category_icon='fas fa-comment')
+appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-signal')
+appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-signal')
 appbuilder.add_view_no_menu(Report)
 
 #mass_update()
 #set_comments_blank()
-set_comments_included()
+#set_comments_included()
 #transmittall()
 
 
