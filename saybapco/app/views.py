@@ -262,8 +262,8 @@ appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branc
 appbuilder.add_view_no_menu(Report)
 
 #mass_update()
-set_comments_blank()
-#set_comments_included()
+#set_comments_blank()
+set_comments_included()
 #transmittall()
 
 
