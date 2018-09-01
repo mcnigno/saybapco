@@ -12,7 +12,7 @@ from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
-from mass_update import test_closed
+from mass_update import test_closed, reply_rev
 
 
 #
@@ -45,9 +45,9 @@ class Report(BaseView):
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['document','revision','comment', 'reply', 'included','closed']
-    #base_order = ('document','asc')
-    order_columns = ['document', 'revision', 'id_c']
+    search_columns = ['included','closed', 'document','revision', 'reply']
+    base_order = ('id_c','asc')
+    order_columns = ['id_c']
     label_columns = {
         'pretty_style' : 'Type',
         'pretty_included': 'Included',
@@ -62,7 +62,7 @@ class CommentView(ModelView):
     }
     #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
     list_columns = ['document','pretty_revision','pretty_style', 'pretty_comment','note',  'pretty_reply', 'pretty_included','pretty_closed']
-    show_exclude_columns = ['partner']
+
     #list_widget = ListThumbnail
     
     add_exclude_columns = ['created_on', 'changed_on']
@@ -153,7 +153,6 @@ class CommentsPieChart(GroupByChartView):
         ]
 
 class RevisionView(ModelView):
-    order_columns = ['document', 'asc']
     datamodel = SQLAInterface(Revisions)
     label_columns = {
         'pretty_revision': 'Rev.',
@@ -162,11 +161,9 @@ class RevisionView(ModelView):
         'pretty_date_trs': 'Trans. Date',
         'trasmittal': 'Transmittal'
     }
-    search_columns = ['document','revision', 'reply','trasmittal', 'date_trs' ]
-    list_columns = ['document', 'pretty_revision', 'pretty_date_trs','trasmittal','file_name', 'download']
-    #list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
+    list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
-    edit_exclude_columns = ['created_on', 'changed_on', 'file','comments']
+    edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
     show_exclude_columns = ['comments']
 
@@ -200,12 +197,11 @@ class RevisionView(ModelView):
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
     related_views = [CommentView, RevisionView]
-    order_columns = ['document', 'asc']
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
     search_exclude_columns = ['created_on', 'changed_on']
-    search_columns = ['unit', 'materialclass', 'doctype', 'serial', 'partner','closed']
+    search_columns = ['partner', 'serial','closed' ]
     label_columns = {
         'name': 'Bapco Code',
         'count': 'Tot',
@@ -213,10 +209,9 @@ class DocumentView(ModelView):
         'count_closed': 'Closed',
         'count_open': 'Open',
         'count_no_reply': "No Reply",
-        'pretty_closed' : 'Closed'
     }
-    #list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
-    list_columns = ['name','pretty_closed','partner', 'revision', 'count', 'count_open']
+    list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
+    
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
         if isinstance(items, list):
@@ -254,17 +249,19 @@ appbuilder.security_cleanup()
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 #appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 
-appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comment Sheet", category_icon='fas fa-comment')
-appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comment Sheet", category_icon='fas fa-comment')
-appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comment Sheet", category_icon='fas fa-comment')
-appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-signal')
-appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-signal')
+appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
+appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view_no_menu(Report)
 
 #mass_update()
 #set_comments_blank()
 #set_comments_included()
 #transmittall()
+
+reply_rev()
 
 
 #check_doc_closed2() 

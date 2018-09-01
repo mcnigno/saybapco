@@ -22,14 +22,13 @@ def test_closed(doc_id):
         if com.closed == False:
             closed = False
             break
+        
         print('comment closed:',com, com.closed)
     print('comment closed:',com, com.closed)
     document.closed = closed
     print('document closed?', document.closed)
     document.changed_by_fk = '1'
     db.session.commit()
-    session.close()
-    
 def report_all():
     filepath = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(filepath)
@@ -121,13 +120,16 @@ def report_all():
     
     
     file = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
-    session.close()
     #print(file.name)
     return file
     
 
 
 def transmittall():
+
+   #
+   # Update Trasmittal and date matching data from this two report
+   #   
     report = open(UPLOAD_FOLDER + 'report/Report.xlsx', mode='rb')
     wb = openpyxl.load_workbook(report)
     ws = wb.active
@@ -136,6 +138,10 @@ def transmittall():
     bb = openpyxl.load_workbook(report_bapco)
     bs = bb.active
     
+    #
+    # For every document's revision in the db look for data
+    #
+
     document = models.Document
     document_l = db.session.query(document).all()
 
@@ -144,7 +150,9 @@ def transmittall():
         for rev in doc.revision:
 
             #print(code, '*', rev)
-
+            # 
+            # Over Report.xlsx Column[2] == code AND Column[4] == revision
+            #
             for row in ws.iter_rows(min_row=2):
                 #print('------------')
                 #print(row[2].value, code)
@@ -155,7 +163,7 @@ def transmittall():
                     bapco_code = row[2].value
                     revision = row[4].value
                     bapco_transmittal = row[0].value
-
+                     
                     for nrow in bs.iter_rows(min_row=2):
                         if bapco_transmittal == nrow[3].value[6:]:
                             print('transmittal')
@@ -164,17 +172,49 @@ def transmittall():
                             print(nrow[0].value)
                             trans = nrow[0].value
                             date = nrow[1].value
+                            gg,mm,aa = date.split("/")
+                            print(date)
+                            date = aa + r"/" + mm + r"/" + gg 
+                            print(date)
                             revisions = models.Revisions
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
                             rev.trasmittal = trans
                             rev.changed_by_fk = '1'
                             rev.date_trs = date
+                            rev.note = nrow[3].value
                             doc.changed_by_fk = '1'
                             doc.partner = trans[4:7]
-                    db.session.commit()
-    session.close() 
+                    db.session.commit() 
+def reply_rev():
+    '''
+    Danilo,
+    partendo dalla lista Report.xlsx:
+    '''
+    report = open(UPLOAD_FOLDER + 'report/Report.xlsx', mode='rb')
+    wb = openpyxl.load_workbook(report)
+    ws = wb.active
+    '''
+    quando la revisione del documento1 è X-REPLY (X=numero/lettera) cerca nella lista documento1 con rev. X
+    '''
+    document = models.Document
+    document_l = db.session.query(document).filter()
 
-def comments(item):
+    for doc in document_l:
+        code = '-'.join([doc.unit, doc.materialclass, doc.doctype, doc.serial, doc.sheet])
+        for rev in doc.revision:
+            if rev.reply:
+                print('is a a reply:', doc, rev)
+    '''
+    Se nella linea precedente il numero di documento corrisponde (documento1 con rev ≠ X) , prendi il transmittal e la data corrispondenti.
+    Spero di essere stata chiara.
+    Federica
+    '''
+
+
+
+
+
+def comments(item): 
 
     print('file processed:', str(item.file))
     file = open(UPLOAD_FOLDER + 'CS_OLD2/' + get_file_original_name(item.file), mode='rb')
@@ -216,13 +256,13 @@ def comments(item):
     
     try:
 
-        #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+        print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
         
         comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
-        #print('the comments len is:', len(comm_list))
+        print('the comments len is:', len(comm_list))
         
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-        #print('delete query executed')
+        print('delete query executed')
     
     except:
 
@@ -255,7 +295,7 @@ def comments(item):
                 closed = sanetext(row[7].value)
 
 
-                #print(id_c, style, author)
+                print(id_c, style, author)
                 
                 yes = ['Y','y','Yes','YES']
                 if closed in yes:
@@ -268,7 +308,7 @@ def comments(item):
                 else:
                     included = False
 
-                #print('before comment')
+                print('before comment')
                 print('document id', item.document_id,'revision:', item.id)
                 comm = comments(created_by_fk = 1, changed_by_fk = 1, id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
@@ -276,7 +316,7 @@ def comments(item):
                 
                 session.add(comm)
 
-                #print('after comment')
+                print('after comment')
             
                 
             except:
@@ -285,7 +325,6 @@ def comments(item):
                 pass
     
     session.commit()
-    session.close()
     print('list of Errors:')
     print(errors_list)
     return 'done'
@@ -307,7 +346,6 @@ def check_doc_closed(doc_id):
     document.closed = closed
     document.changed_by_fk = '1'
     db.session.commit()
-    session.close()
 
 def check_Doc(item):
     filename = item
@@ -335,7 +373,6 @@ def check_Doc(item):
 
         session.flush()
         session.commit()
-        session.close()
 
         return document.id, document.partner
 
@@ -351,7 +388,7 @@ def mass_update():
         #print('processing Rev:', revision)
         # Check the revision A ...
         i = 0
-        for file in glob.glob("*.*"):
+        for file in glob.glob("*.xlsx"):
             i += 1
             print(i, file)
 
@@ -390,13 +427,11 @@ def mass_update():
                 db.session.flush()
                 comments(new_rev)
                 check_doc_closed(new_rev.document_id)
-            else:
-                print('REV NOT FOUND', rev[1], file)
-                #print(file)
+        
         db.session.commit()
         # Check for the replay
                 
-        for file in glob.glob("*.*"):
+        for file in glob.glob("*.xlsx"):
             _, _, _, _, _, rev, cs = file.split('-')
             cs = cs[:-5]
             if rev[1] == revision and cs == 'CS REP':
@@ -424,12 +459,6 @@ def mass_update():
             
                 #print('REV NOT FOUND', rev[1], file)
         db.session.commit()
-    db.session.close()
-
-    errors_list.add(file)
-    #print('error file:', file)
     
-    print('+++++++++  ERROR LIST ++++++++')
-    print(errors_list)
 
 
