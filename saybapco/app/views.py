@@ -3,7 +3,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2
+from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2, check_duplicates
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
@@ -264,6 +264,7 @@ appbuilder.add_view_no_menu(Report)
 #set_comments_included()
 #transmittall()
  
+check_duplicates()
 #reply_rev()
 
 
