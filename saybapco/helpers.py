@@ -21,7 +21,11 @@ def sanetext(input_string):
 #
 
 
-
+def check_duplicates():
+    document = models.Document
+    doc_list = db.session.query(document).all()
+    for doc in doc_list:
+        print(doc.code, doc.rev)
 
 def comments(item):
 
