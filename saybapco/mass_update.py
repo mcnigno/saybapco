@@ -175,9 +175,9 @@ def transmittall():
                             print(nrow[0].value)
                             trans = nrow[0].value
                             date = nrow[1].value
-                            gg,mm,aa = date.split("/")
+                            #gg,mm,aa = date.split("/")
         
-                            date = aa + r"/" + mm + r"/" + gg 
+                            #date = aa + r"/" + mm + r"/" + gg 
         
                             revisions = models.Revisions
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
