@@ -175,12 +175,16 @@ def transmittall():
                             print(nrow[0].value)
                             trans = nrow[0].value
                             date = str(nrow[1].value)
-                            gg,mm,aa = date.split("/")
-        
-                            date = aa + r"/" + mm + r"/" + gg 
-        
+
                             revisions = models.Revisions
+                            try:
+                                gg,mm,aa = date.split("/")
+                                date = aa + r"/" + mm + r"/" + gg 
+                            except:
+                                date = "01/01/2015"
+                            
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
+                            rev.date_trs = date
                             rev.trasmittal = trans
                             rev.changed_by_fk = '1'
                             rev.date_trs = date
