@@ -30,14 +30,15 @@ def check_duplicates():
     dupes = []
 
     for rev in rev_list:
-        if rev.document not in seen:
-            seen[rev.document] = 1
+        rev_key = rev.document + rev.revision
+        if rev_key not in seen:
+            seen[rev_key] = 1
         else:
-            if seen[rev.document] == 1:
-                dupes.append(rev.document)
-            seen[rev.document] += 1
-    print('seen',seen)
-    print('dupes',dupes)
+            if seen[rev_key] == 1:
+                dupes.append(rev_key)
+            seen[rev_key] += 1
+    print('seen',len(seen))
+    print('dupes',len(dupes))
 
 def comments(item):
 
