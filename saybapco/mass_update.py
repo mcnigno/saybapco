@@ -174,10 +174,10 @@ def transmittall():
                             print(nrow[3].value[6:])
                             print(nrow[0].value)
                             trans = nrow[0].value
-                            date = nrow[1].value
-                            #gg,mm,aa = date.split("/")
+                            date = str(nrow[1].value)
+                            gg,mm,aa = date.split("/")
         
-                            #date = aa + r"/" + mm + r"/" + gg 
+                            date = aa + r"/" + mm + r"/" + gg 
         
                             revisions = models.Revisions
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
