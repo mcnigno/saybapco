@@ -25,7 +25,7 @@ def check_duplicates():
     document = models.Document
     doc_list = db.session.query(document).all()
     for doc in doc_list:
-        print(doc.code, doc.rev)
+        print(doc.id, doc.code)
 
 def comments(item):
 
