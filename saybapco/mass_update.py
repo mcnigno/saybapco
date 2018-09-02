@@ -181,7 +181,7 @@ def transmittall():
                                 gg,mm,aa = date.split("/")
                                 date = aa + r"/" + mm + r"/" + gg 
                             except:
-                                date = "01/01/2015"
+                                date = "2015/01/01"
                             
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
                             rev.date_trs = date
