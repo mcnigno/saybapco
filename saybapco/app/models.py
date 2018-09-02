@@ -35,7 +35,13 @@ class Document(AuditMixin, Model):
     partner = Column(String(3), nullable=False)
     sheet = Column(String(3))
     closed = Column(Boolean, default=False)
-
+    code = Column(String(25))
+    
+    def __init__(self, **kwargs):
+        super(Document, self).__init__(**kwargs)
+        self.code = '-'.join([self.unit, self.materialclass,
+                        self.doctype, self.serial, self.sheet])
+    
     def __repr__(self):
         name = '-'.join([self.unit, self.materialclass,
                         self.doctype, self.serial, self.sheet])

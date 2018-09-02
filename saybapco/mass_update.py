@@ -8,8 +8,10 @@ from flask_appbuilder.filemanager import get_file_original_name
 import openpyxl
 from flask import send_file
 from config import UPLOAD_FOLDER
-
+ 
 errors_list = set()
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 def test_closed(doc_id):
     doc = models.Document
@@ -126,15 +128,16 @@ def report_all():
 
 
 def transmittall():
+    print('transmittal function ********')
 
-   #
-   # Update Trasmittal and date matching data from this two report
-   #   
-    report = open(UPLOAD_FOLDER + 'report/Report.xlsx', mode='rb')
+    #
+    # Update Trasmittal and date matching data from this two report
+    #   
+    report = open(basedir+'/report/Report.xlsx', mode='rb')
     wb = openpyxl.load_workbook(report)
     ws = wb.active
-
-    report_bapco = open(UPLOAD_FOLDER + 'report/Report_by_BAPCO.xlsx', mode='rb')
+ 
+    report_bapco = open(basedir+'/report/Report_by_BAPCO.xlsx', mode='rb')
     bb = openpyxl.load_workbook(report_bapco)
     bs = bb.active
     
@@ -144,7 +147,7 @@ def transmittall():
 
     document = models.Document
     document_l = db.session.query(document).all()
-
+    
     for doc in document_l:
         code = '-'.join([doc.unit, doc.materialclass, doc.doctype, doc.serial, doc.sheet])
         for rev in doc.revision:
@@ -158,7 +161,7 @@ def transmittall():
                 #print(row[2].value, code)
                 #print(row[4].value, rev)
                 if row[2].value == code and row[4].value == str(rev):
-                    print('TRANSMITTAL')   
+                      
 
                     bapco_code = row[2].value
                     revision = row[4].value
@@ -166,16 +169,16 @@ def transmittall():
                      
                     for nrow in bs.iter_rows(min_row=2):
                         if bapco_transmittal == nrow[3].value[6:]:
-                            print('transmittal')
+                            
                             print(code)
                             print(nrow[3].value[6:])
                             print(nrow[0].value)
                             trans = nrow[0].value
                             date = nrow[1].value
                             gg,mm,aa = date.split("/")
-                            print(date)
+        
                             date = aa + r"/" + mm + r"/" + gg 
-                            print(date)
+        
                             revisions = models.Revisions
                             #rev_update = db.session.query(revisions).filter(revisions.id == rev.id).first()
                             rev.trasmittal = trans
@@ -184,7 +187,13 @@ def transmittall():
                             rev.note = nrow[3].value
                             doc.changed_by_fk = '1'
                             doc.partner = trans[4:7]
-                    db.session.commit() 
+
+                            db.session.commit() 
+    db.session.close()
+                         
+
+
+                           
 def reply_rev():
     '''
     Danilo,
@@ -217,7 +226,7 @@ def reply_rev():
 def comments(item): 
 
     print('file processed:', str(item.file))
-    file = open(UPLOAD_FOLDER + 'CS_OLD2/' + get_file_original_name(item.file), mode='rb')
+    file = open(basedir + '/batch/' + get_file_original_name(item.file), mode='rb')
     
     #print('file processed:', file)
 
@@ -350,7 +359,7 @@ def check_doc_closed(doc_id):
 def check_Doc(item):
     filename = item
     unit = filename[0:3]
-    partner = filename[4:7]
+    partner = "ND"
     mat = filename[4]
     doctype = filename[6:9]
     serial = filename[10:15]
@@ -379,7 +388,7 @@ def check_Doc(item):
 
 def mass_update():
     
-    os.chdir(UPLOAD_FOLDER +'CS_OLD2')
+    os.chdir(basedir +'/batch')
 
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
@@ -429,6 +438,7 @@ def mass_update():
                 check_doc_closed(new_rev.document_id)
         
         db.session.commit()
+        db.session.close()
         # Check for the replay
                 
         for file in glob.glob("*.xlsx"):
@@ -459,6 +469,7 @@ def mass_update():
             
                 #print('REV NOT FOUND', rev[1], file)
         db.session.commit()
+        db.session.close()
     
 
 

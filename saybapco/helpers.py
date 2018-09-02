@@ -147,8 +147,9 @@ def check_Doc(self, item):
                                  doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
-        
+        session.close()
         return document.id, document.partner
+    
     else:
         document = doc(unit=unit, materialclass=mat, doctype=doctype, 
                        serial=serial, sheet=sheet, partner=partner)
@@ -187,7 +188,7 @@ def check_doc_closed(doc_id):
     document.closed = closed
     document.changed_by_fk = '1'
     db.session.commit()
-    session.close()
+    db.session.close()
 
 def set_comments_blank():
     comment = models.Comments
@@ -389,7 +390,7 @@ def report_all():
     
     file = filepath
     #print(file.name)
-    session.close()
+    db.session.close()
     return file
 
 def check_doc_closed2():

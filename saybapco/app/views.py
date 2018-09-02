@@ -45,7 +45,7 @@ class Report(BaseView):
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
-    search_columns = ['included','closed', 'document','revision', 'reply']
+    search_columns = ['included','closed', 'document','revision']
     base_order = ('id_c','asc')
     order_columns = ['id_c']
     label_columns = {
@@ -154,19 +154,21 @@ class CommentsPieChart(GroupByChartView):
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
+    search_columns = ['document','revision','reply', 'trasmittal','date_trs']
     label_columns = {
+        'document': 'Bapco Code',
         'pretty_revision': 'Rev.',
         'pretty_doc_revision': 'Document',
         'pretty_date': 'Date',
         'pretty_date_trs': 'Trans. Date',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['pretty_doc_revision', 'pretty_revision', 'trasmittal', 'pretty_date_trs', 'note', 'file_name', 'download']
+    list_columns = ['document.code', 'pretty_revision','reply', 'trasmittal', 'pretty_date_trs', 'note', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
     show_exclude_columns = ['comments']
-
+    base_order = ('document.code','asc')
     related_views = [CommentView]
 
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
@@ -201,16 +203,16 @@ class DocumentView(ModelView):
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
     search_exclude_columns = ['created_on', 'changed_on']
-    search_columns = ['partner', 'serial','closed' ]
+    search_columns = ['partner', 'code' ]
     label_columns = {
-        'name': 'Bapco Code',
+        'code': 'Bapco Code',
         'count': 'Tot',
         'count_included': 'Included',
         'count_closed': 'Closed',
         'count_open': 'Open',
         'count_no_reply': "No Reply",
     }
-    list_columns = ['name','partner', 'revision', 'count','is_closed','closed', 'count_open', 'count_no_reply', 'count_closed', 'count_included']
+    list_columns = ['code','partner', 'revision', 'count', 'count_included' ,'count_closed']
     
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -244,7 +246,7 @@ def page_not_found(e):
 
 db.create_all()
 from mass_update import mass_update
-appbuilder.security_cleanup()
+#appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 #appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
@@ -260,8 +262,8 @@ appbuilder.add_view_no_menu(Report)
 #set_comments_blank()
 #set_comments_included()
 #transmittall()
-
-reply_rev()
+ 
+#reply_rev()
 
 
 #check_doc_closed2() 
