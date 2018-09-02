@@ -30,6 +30,12 @@ def check_duplicates():
 
     for rev in rev_list:
         rev_key = str(rev.document) + str(rev.revision)
+
+        if rev.reply:
+            rev_key = str(rev.document) + str(rev.revision) + "-Reply"
+
+            
+        
         if rev_key not in seen:
             seen[rev_key] = 1
         else:
