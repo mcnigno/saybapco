@@ -431,7 +431,7 @@ def mass_update():
                 #new_rev.revision = revision
                 rev_to_check = models.Revisions
                 exist = db.session.query(rev_to_check).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:]).first()
-                if len(exist) == 1:
+                if exist is not None:
                     print('This Rev Already Exist - Not Added')
                 else:
                     print('exist is there..', exist)
@@ -463,7 +463,7 @@ def mass_update():
                 #new_rev.revision = revision
                 new_rev.reply = True
                 exist = db.session.query(models.Revisions).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:], rev_to_check.reply == True).first()
-                if len(exist) == 1:
+                if exist is not None:
                     print('This Rev Already Exist - Not Added')
                 else:
                     print('exist is there..', exist)
