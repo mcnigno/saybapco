@@ -26,7 +26,19 @@ def check_duplicates():
     doc_list = db.session.query(document).all()
     for doc in doc_list:
         print(doc.id, doc.code)
+    seen = {}
+    dupes = []
 
+    for doc in doc_list:
+        if doc.code not in seen:
+            seen[doc.code] = 1
+        else:
+            if seen[doc.code] == 1:
+                dupes.append(doc.code)
+            seen[doc.code] += 1
+    print('seen',seen)
+    print('dupes',dupes)
+    
 def comments(item):
 
     print('file processed:', str(item.file))
