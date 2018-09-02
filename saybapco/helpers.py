@@ -24,8 +24,7 @@ def sanetext(input_string):
 def check_duplicates():
     revision = models.Revisions
     rev_list = db.session.query(revision).all()
-    for rev in rev_list:
-        print(rev.id, rev.document)
+    
     seen = {}
     dupes = []
 
@@ -39,6 +38,9 @@ def check_duplicates():
             seen[rev_key] += 1
     print('seen',len(seen))
     print('dupes',len(dupes))
+    for n in range(10):
+        for d in dupes:
+            print(d)
 
 def comments(item):
 
