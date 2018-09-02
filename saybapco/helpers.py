@@ -22,23 +22,23 @@ def sanetext(input_string):
 
 
 def check_duplicates():
-    document = models.Document
-    doc_list = db.session.query(document).all()
-    for doc in doc_list:
-        print(doc.id, doc.code)
+    revision = models.Revisions
+    rev_list = db.session.query(revision).all()
+    for rev in rev_list:
+        print(rev.id, rev.document)
     seen = {}
     dupes = []
 
-    for doc in doc_list:
-        if doc.code not in seen:
-            seen[doc.code] = 1
+    for rev in rev_list:
+        if rev.document not in seen:
+            seen[rev.document] = 1
         else:
-            if seen[doc.code] == 1:
-                dupes.append(doc.code)
-            seen[doc.code] += 1
+            if seen[rev.document] == 1:
+                dupes.append(rev.document)
+            seen[rev.document] += 1
     print('seen',seen)
     print('dupes',dupes)
-    
+
 def comments(item):
 
     print('file processed:', str(item.file))
