@@ -429,10 +429,12 @@ def mass_update():
                 new_rev.document_id, new_rev.partner = check_Doc(file)
                 
                 #new_rev.revision = revision
-                exist = db.session.query(models.Revisions).filter(document_id=new_rev.document_id, revision=rev[1:]).first()
+                rev_to_check = models.Revisions
+                exist = db.session.query(rev_to_check).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:]).first()
                 if exist:
                     print('This Rev Already Exist - Not Added')
                 else:
+                    print('exist is there..', exist)
                     db.session.add(new_rev)
 
 
@@ -460,10 +462,11 @@ def mass_update():
                 
                 #new_rev.revision = revision
                 new_rev.reply = True
-                exist = db.session.query(models.Revisions).filter(document_id=new_rev.document_id, revision=rev[1:], reply=True).first()
+                exist = db.session.query(models.Revisions).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:], rev_to_check.reply == True).first()
                 if exist:
                     print('This Rev Already Exist - Not Added')
                 else:
+                    print('exist is there..', exist)
                     db.session.add(new_rev)
                     db.session.flush()
                     comments(new_rev)
