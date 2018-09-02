@@ -44,9 +44,10 @@ def check_duplicates():
             seen[rev_key] += 1
     print('seen',len(seen))
     print('dupes',len(dupes))
-    for n in range(10):
-        for d in dupes:
-            print(d)
+    for s in range(10):
+        for s in seen:
+            print(s)
+    print('dupes', dupes)
 
 def comments(item):
 
