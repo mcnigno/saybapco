@@ -262,7 +262,7 @@ appbuilder.add_view_no_menu(Report)
 #mass_update()
 #set_comments_blank()
 #set_comments_included()
-#transmittall()
+transmittall()
  
 #reply_rev()
 
