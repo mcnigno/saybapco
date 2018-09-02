@@ -157,6 +157,7 @@ class RevisionView(ModelView):
     search_columns = ['document','revision','reply', 'trasmittal','date_trs']
     label_columns = {
         'document': 'Bapco Code',
+        'document.code': 'Bapco Code',
         'pretty_revision': 'Rev.',
         'pretty_doc_revision': 'Document',
         'pretty_date': 'Date',
