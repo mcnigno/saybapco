@@ -30,7 +30,7 @@ def check_duplicates():
     dupes = []
 
     for rev in rev_list:
-        rev_key = rev.document + rev.revision
+        rev_key = str(rev.document) + str(rev.revision)
         if rev_key not in seen:
             seen[rev_key] = 1
         else:
