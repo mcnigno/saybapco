@@ -13,9 +13,11 @@ errors_list = set()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 def find_action():
+    print('report start ***************')
     report = open(basedir+'/report/Report_action.xlsx', mode='rb')
     wb = openpyxl.load_workbook(report)
     ws = wb.active
+    print('report open ***************')
 
     revision = models.Revisions
     revision_list = db.session.query(revision).all()
