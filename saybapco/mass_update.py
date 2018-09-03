@@ -28,6 +28,9 @@ def find_action():
                 #print(row[1].value,rev.document)
                 if row[1].value == str(rev.document):
                     print(rev.document,row[9].value)
+                    rev.action_code = row[9].value
+                    rev.changed_by_fk = '1'
+                    db.session.commit()
     db.session.close()
 
 
