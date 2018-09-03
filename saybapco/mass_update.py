@@ -24,6 +24,7 @@ def find_action():
 
     for rev in revision_list:
         for row in ws.iter_rows(min_row=2):
+            print(row[1],rev.document)
             if row[1] == str(rev.document):
                 print(rev.document,row[9])
     db.session.close()
