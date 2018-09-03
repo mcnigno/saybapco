@@ -22,11 +22,12 @@ def find_action():
     revision = models.Revisions
     revision_list = db.session.query(revision).all()
 
-    for rev in revision_list:
-        for row in ws.iter_rows(min_row=2):
-            #print(row[1].value,rev.document)
-            if row[1].value == str(rev.document):
-                print(rev.document,row[9].value)
+    for n in range(10):
+        for rev in revision_list:
+            for row in ws.iter_rows(min_row=2):
+                #print(row[1].value,rev.document)
+                if row[1].value == str(rev.document):
+                    print(rev.document,row[9].value)
     db.session.close()
 
 
