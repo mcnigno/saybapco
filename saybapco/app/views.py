@@ -265,7 +265,7 @@ appbuilder.add_view_no_menu(Report)
 #set_comments_included()
 #transmittall()
  
-check_duplicates()
+#check_duplicates()
 #reply_rev()
 
 
