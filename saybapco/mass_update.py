@@ -26,7 +26,7 @@ def find_action():
         for row in ws.iter_rows(min_row=2):
             #print(row[1].value,rev.document)
             if row[1].value == str(rev.document):
-                print(rev.document,row[9])
+                print(rev.document,row[9].value)
     db.session.close()
 
 
