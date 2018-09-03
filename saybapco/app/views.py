@@ -157,6 +157,7 @@ class RevisionView(ModelView):
     search_columns = ['document','revision','reply', 'trasmittal','date_trs']
     label_columns = {
         'document': 'Bapco Code',
+        'action_code': 'Bapco Response Code',
         'document.code': 'Bapco Code',
         'pretty_revision': 'Rev.',
         'pretty_doc_revision': 'Document',
@@ -164,7 +165,7 @@ class RevisionView(ModelView):
         'pretty_date_trs': 'Trans. Date',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['document.code', 'pretty_revision','reply', 'trasmittal', 'pretty_date_trs', 'note', 'download']
+    list_columns = ['document.code', 'pretty_revision','reply', 'trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']

@@ -36,6 +36,7 @@ class Document(AuditMixin, Model):
     sheet = Column(String(3))
     closed = Column(Boolean, default=False)
     code = Column(String(25))
+    action_code = Column(String(100))
     
     def __init__(self, **kwargs):
         super(Document, self).__init__(**kwargs)
@@ -114,7 +115,7 @@ class Revisions(AuditMixin, Model):
     document_id = Column(Integer, ForeignKey('document.id'), nullable=False)
     document = relationship(Document, backref='revision')
     reply = Column(Boolean, default=False)
-
+    action_code = Column(String(100))
     def __repr__(self):
         if self.reply:
             return self.revision +"-Reply"  
