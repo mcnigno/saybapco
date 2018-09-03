@@ -12,7 +12,7 @@ from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
-from mass_update import test_closed, reply_rev
+from mass_update import test_closed, reply_rev, find_action
 
 
 #
@@ -268,5 +268,5 @@ appbuilder.add_view_no_menu(Report)
 #check_duplicates()
 #reply_rev()
 
-
+find_action()
 #check_doc_closed2() 

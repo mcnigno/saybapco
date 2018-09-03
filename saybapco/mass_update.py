@@ -12,6 +12,20 @@ from config import UPLOAD_FOLDER
 errors_list = set()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+def find_action():
+    report = open(basedir+'/report/Report_action.xlsx', mode='rb')
+    wb = openpyxl.load_workbook(report)
+    ws = wb.active
+
+    revision = models.Revisions
+    revision_list = db.session.query(revision).all()
+
+    for rev in revision_list:
+        for row in ws.iter_rows(min_row=2):
+            if row[1] == str(rev.document):
+                print(rev.document,row[9])
+    db.session.close()
+
 
 def test_closed(doc_id):
     doc = models.Document
