@@ -21,16 +21,15 @@ def find_action():
 
     revision = models.Revisions
     revision_list = db.session.query(revision).all()
-
-    for n in range(10):
-        for rev in revision_list:
-            for row in ws.iter_rows(min_row=2):
-                #print(row[1].value,rev.document)
-                if row[1].value == str(rev.document):
-                    print(rev.document,row[9].value)
-                    rev.action_code = row[9].value
-                    rev.changed_by_fk = '1'
-                    db.session.commit()
+    
+    for rev in revision_list:
+        for row in ws.iter_rows(min_row=2):
+            #print(row[2].value,rev.document)
+            if row[2].value == str(rev.document):
+                print(rev.document,row[9].value)
+                rev.action_code = row[9].value
+                rev.changed_by_fk = '1'
+                db.session.commit()
     db.session.close()
 
 
@@ -52,6 +51,8 @@ def test_closed(doc_id):
     print('document closed?', document.closed)
     document.changed_by_fk = '1'
     db.session.commit()
+    db.session.close()
+
 def report_all():
     filepath = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(filepath)
