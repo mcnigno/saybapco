@@ -268,5 +268,5 @@ appbuilder.add_view_no_menu(Report)
 #check_duplicates()
 #reply_rev()
 
-find_action()
+#find_action()
 #check_doc_closed2() 
