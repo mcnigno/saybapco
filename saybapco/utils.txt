@@ -1,0 +1,8 @@
+## SQL to csv
+
+SELECT *
+FROM revisions
+INTO OUTFILE '/var/lib/mysql-files/revisions.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
