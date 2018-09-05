@@ -163,6 +163,7 @@ class RevisionView(ModelView):
         'pretty_doc_revision': 'Document',
         'pretty_date': 'Date',
         'pretty_date_trs': 'Trans. Date',
+        'download': 'File',
         'trasmittal': 'Transmittal'
     }
     list_columns = ['document.code', 'pretty_revision','reply', 'trasmittal', 'pretty_date_trs','action_code', 'note', 'download']

@@ -126,8 +126,9 @@ class Revisions(AuditMixin, Model):
 
 
     def download(self):
-        return Markup(
-            '<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '">Download</a>')
+        #return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '">Download</a>')
+        #return Markup('<a href="/static/csv/' + filename +'" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
+        return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
 
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')
