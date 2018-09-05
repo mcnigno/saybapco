@@ -166,10 +166,10 @@ class RevisionView(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['document.code', 'pretty_revision','reply', 'trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    add_columns = ['file', 'revision', 'trasmittal', 'date_trs', 'note']
+    add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('document.code','asc')
     related_views = [CommentView]
