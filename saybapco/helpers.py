@@ -153,7 +153,7 @@ def comments(item):
                 pass
     
     session.commit()
-    session.close()
+    #session.close()
     
     return 'done'
 
@@ -173,7 +173,7 @@ def check_Doc(self, item):
                                  doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
 
     if document:
-        session.close()
+        #session.close()
         return document.id, document.partner
     
     else:
@@ -184,7 +184,7 @@ def check_Doc(self, item):
 
         session.flush()
         session.commit()
-        session.close()
+        #session.close()
 
         return document.id, document.partner
     
@@ -214,7 +214,7 @@ def check_doc_closed(doc_id):
     document.closed = closed
     document.changed_by_fk = '1'
     db.session.commit()
-    db.session.close()
+    #db.session.close()
 
 def set_comments_blank():
     comment = models.Comments
