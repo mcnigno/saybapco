@@ -80,7 +80,7 @@ class CommentView(ModelView):
     
     #@has_access
     @action("include", "Include All", "Iclude all Really?", "fa-rocket")
-    def close(self, items):
+    def include(self, items):
         if isinstance(items, list):
             for item in items:
                 item.closed = True
