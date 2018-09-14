@@ -78,15 +78,17 @@ class CommentView(ModelView):
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
     @has_access
-    @action("close", "Close", "Close all Really?", "fa-rocket")
+    @action("include", "Include All", "Iclude all Really?", "fa-rocket")
     def close(self, items):
         if isinstance(items, list):
             for item in items:
                 item.closed = True
+                item.included = True
                 self.datamodel.edit(item)
             self.update_redirect()
         else:
             items.closed = True
+            items.included = True
             self.datamodel.edit(item)
         return redirect(self.get_redirect())
     def post_update(self, item):
