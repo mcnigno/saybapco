@@ -77,7 +77,8 @@ class CommentView(ModelView):
         else:
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
-    @has_access
+    
+    #@has_access
     @action("include", "Include All", "Iclude all Really?", "fa-rocket")
     def close(self, items):
         if isinstance(items, list):
