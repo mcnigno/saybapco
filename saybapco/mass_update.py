@@ -3,7 +3,6 @@ from app import models, db
 from flask_appbuilder import filemanager
 import uuid, openpyxl
 from helpers import sanetext
-from config import UPLOAD_FOLDER
 from flask_appbuilder.filemanager import get_file_original_name
 import openpyxl
 from flask import send_file
@@ -31,7 +30,7 @@ def find_action():
                 rev.changed_by_fk = '1'
                 db.session.commit()
     db.session.close()
-
+ 
 
 def test_closed(doc_id):
     doc = models.Document

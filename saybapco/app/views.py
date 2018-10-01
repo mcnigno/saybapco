@@ -13,6 +13,7 @@ from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
 from mass_update import test_closed, reply_rev, find_action
+from helpers import sanatoria_cs
 
 
 #
@@ -275,3 +276,5 @@ appbuilder.add_view_no_menu(Report)
 
 #find_action()
 #check_doc_closed2() 
+
+#sanatoria_cs()

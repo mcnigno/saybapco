@@ -5,6 +5,9 @@ from flask_appbuilder.filemanager import get_file_original_name
 from openpyxl.styles import Font, Color
 from openpyxl.worksheet.table import Table, TableStyleInfo
 import uuid
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def parse_escaped_character_match(match):
@@ -420,6 +423,7 @@ def report_all():
     return file
 
 def check_doc_closed2():
+
     doc = models.Document
     documents = db.session.query(doc).all()
     
@@ -438,3 +442,34 @@ def check_doc_closed2():
         db.session.commit()
     db.session.close()
         #return True
+
+
+
+
+def update_cs(code, rev):
+    print('cs found ***************')
+    session = db.session
+    cs_rev = models.Revisions
+    doc = models.Document
+    print(code)
+    document = session.query(doc).filter(doc.code==code).first() 
+    #print(document.code, document.id)
+    '''
+    cs = session.query(cs_rev).filter(cs_rev.document.code==code, cs_rev.revision==rev).all()
+    session.close()
+    print(cs)
+    return cs 
+    '''
+def sanatoria_cs():
+    print('sanatoria start ***************')
+
+    report = open(basedir+'/sanatorie/sanatoria01_10_2018.xlsx', mode='rb')
+    wb = openpyxl.load_workbook(report)
+    ws = wb.active
+
+    for row in ws.iter_rows(min_row=2):
+            #print(row[2].value)
+            #if row[2].value == str(rev.document) and row[4].value == str(rev.revision):
+            #print(rev.document,row[9].value)
+            cs = update_cs(row[0].value,row[1].value)
+            print(cs)
