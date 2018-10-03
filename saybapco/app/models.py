@@ -104,7 +104,7 @@ class Document(AuditMixin, Model):
         if self.closed:
             return "YES"
         return "NO"
-
+ 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
     file = Column(FileColumn, nullable=False)
