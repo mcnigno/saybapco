@@ -202,7 +202,7 @@ class RevisionView(ModelView):
                             {'fields': ['document.code', 'revision', 'trasmittal', 'date_trs','action_code', 'note']}
                         ),
                         (
-                            'Document Audit',
+                            'Revision Audit',
                             {'fields': ['created_on',
                                         'created_by',
                                         'changed_on',
@@ -269,7 +269,7 @@ class DocumentView(ModelView):
     show_fieldsets = [
                         (
                             'Document Info',
-                            {'fields': ['code', 'revision', 'note']}
+                            {'fields': ['code', 'revision', 'partner']}
                         ),
                         (
                             'Document Audit',
