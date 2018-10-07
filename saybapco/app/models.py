@@ -116,6 +116,7 @@ class Revisions(AuditMixin, Model):
     document = relationship(Document, backref='revision')
     reply = Column(Boolean, default=False)
     action_code = Column(String(100))
+    
     def __repr__(self):
         if self.reply:
             return self.revision +"-Reply"  

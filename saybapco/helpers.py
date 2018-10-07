@@ -5,6 +5,8 @@ from flask_appbuilder.filemanager import get_file_original_name
 from openpyxl.styles import Font, Color
 from openpyxl.worksheet.table import Table, TableStyleInfo
 import uuid
+#from views import Report
+from flask import render_template, abort
 
 
 def parse_escaped_character_match(match):
@@ -50,52 +52,53 @@ def check_duplicates():
     print('dupes', dupes)
 
 def comments(item):
-
-    print('file processed:', str(item.file))
-    file = open(UPLOAD_FOLDER + item.file, mode='rb')
-    print('file processed:', file)
-
-    #file = open('/Users/dp/py3/saybapco/saybapco/comments/019-C-GAD-10010-001-RAP-CS REPLY.xlsx', mode='rb')
-    #filename = '019-C-GAD-10010-001-RAP-CS REPLY.xlsx'
-
-    filename = get_file_original_name(item.file)
-    unit = filename[0:3]
-
-    #partner = filename[4]
-
-    mat = filename[4]
-    doctype = filename[6:9]
-    serial = filename[10:15]
-    type_reply = False
-
     try:
+        #print('file processed:', str(item.file))
+        
+        #print('file processed:', file)
+
+        #file = open('/Users/dp/py3/saybapco/saybapco/comments/019-C-GAD-10010-001-RAP-CS REPLY.xlsx', mode='rb')
+        #filename = '019-C-GAD-10010-001-RAP-CS REPLY.xlsx'
+
+        filename = get_file_original_name(item.file)
+        unit = filename[0:3]
+
+        #partner = filename[4]
+
+        mat = filename[4]
+        doctype = filename[6:9]
+        serial = filename[10:15]
+        type_reply = False
+
+        
         #if filename[26:29] == "REP":
         if filename[-8:-5] == "REP":
             print('Reply identification: ', filename[-8:-5] )
             type_reply = True
     except:
-        pass
+        abort(400,'Please check your file name.')
     
-    wb = openpyxl.load_workbook(file)
-    ws = wb.active
-
-    session = db.session
-    comments= models.Comments
-    documents = models.Document
-    revisions = models.Revisions
-
-    revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
-    #revision = session.query(revisions).filter(revisions.id == item.id).first()
-    session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
     try:
-        print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
-        comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
-        print('the comments len is:', len(comm_list))
+        file = open(UPLOAD_FOLDER + item.file, mode='rb')
+        wb = openpyxl.load_workbook(file)
+        ws = wb.active
+
+        session = db.session
+        comments= models.Comments
+        documents = models.Document
+        revisions = models.Revisions
+
+        revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
+        #revision = session.query(revisions).filter(revisions.id == item.id).first()
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-        print('delete query executed')
+    
+        #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+        comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
+        #print('the comments len is:', len(comm_list))
+        session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+        #print('delete query executed')
     except:
-        print('some problem here')
-        pass
+        abort(400,'Please check your Excel file format.')
     
 
     #session.commit()
@@ -104,13 +107,13 @@ def comments(item):
     #print('document id', item.document_id,'revision:', item.id)
     partner = item.partner
     #revision = item.revision
-
-    for row in ws.iter_rows(min_row=2):
-        print(row[0].value, row[1].value, row[2].value,
-              row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
-        if row[0].value is not None:
-            print('row 0 in not null', row[0].value)
-            try:
+    try:
+        for row in ws.iter_rows(min_row=2):
+            #print(row[0].value, row[1].value, row[2].value,
+                #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
+            if row[0].value is not None:
+                #print('row 0 in not null', row[0].value)
+                
 
 
                 id_c = sanetext(row[0].value)
@@ -123,7 +126,7 @@ def comments(item):
                 closed = sanetext(row[7].value)
 
 
-                print(id_c, style, author)
+                #print(id_c, style, author)
                 
 
 
@@ -134,61 +137,109 @@ def comments(item):
                 
                 if included == 'Y':
                     included = True
+                    closed = True
                 else:
                     included = False
                                 
-                print('before comment')
-                print('document id', item.document_id,'revision:', item.id)
+                #print('before comment')
+                #print('document id', item.document_id,'revision:', item.id)
                 comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
                 
                 session.add(comm)
 
-                print('after comment')
+                #print('after comment')
             
                 
-            except:
-                print('something is None')
-                pass
+    except:
+        abort(400,'Please check your Excel file format.')
     
     session.commit()
     #session.close()
     
     return 'done'
 
-def check_Doc(self, item):
+def precheck_doc(self, item):
     filename = get_file_original_name(item.file)
-    unit = filename[0:3]
-    partner = item.trasmittal[4:7]
-    mat = filename[4]
-    doctype = filename[6:9]
-    serial = filename[10:15]
-    sheet = filename[16:19]
+    filename_list = filename.split('-',6)
 
-
-    session = db.session
-    doc = models.Document
-    document = session.query(doc).filter(doc.unit == unit, doc.materialclass == mat,
-                                 doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
-
-    if document:
-        #session.close()
-        return document.id, document.partner
-    
-    else:
-        document = doc(unit=unit, materialclass=mat, doctype=doctype, 
-                       serial=serial, sheet=sheet, partner=partner)
+    try:
+        filename_list = filename.split('-')
+        print(len(filename_list), filename)
+        if len(filename_list) != 7:
+            return False, "Please check your File Name: " + filename
+         
+        rev = models.Revisions
+        this_reply = False
+        if filename_list[6] == 'CS REP.xlsx':
+            this_reply = True
         
-        session.add(document)
+        print('rev.reply == item.reply',rev.reply, item.reply)
+        revision = db.session.query(rev).filter(rev.document_id == item.document_id, rev.revision == item.revision, rev.reply == this_reply).first()
+        print(filename_list[6])
 
-        session.flush()
-        session.commit()
-        #session.close()
+        this_rev = item.revision
+        if filename_list[6] == 'CS REP.xlsx':
+            this_rev = this_rev + '-Reply'
+        
 
-        return document.id, document.partner
+        print('revision',revision, 'item rev', this_rev)
+        if str(this_rev) == str(revision):
+            return False, "The Revision {0} already exist.".format(this_rev)
+
+    except:
+        return False, "Something Wrong Whit Your File Name: " + filename
+
     
-    
+    return True, "File uploaded " + filename
+
+def check_Doc(self, item):
+    try:
+        filename = get_file_original_name(item.file)
+        filename_list = filename.split('-',6)
+        
+        unit = filename[0:3]
+        partner = item.trasmittal[4:7]
+        mat = filename[4]
+        doctype = filename[6:9]
+        serial = filename[10:15]
+        sheet = filename[16:19]
+
+        session = db.session
+        doc = models.Document
+        document = session.query(doc).filter(doc.unit == unit, doc.materialclass == mat,
+                                    doc.doctype == doctype, doc.serial == serial, doc.sheet == sheet).first()
+
+        if document:
+            #session.close()
+            return document.id, document.partner
+        
+        else:
+            document = doc(unit=unit, materialclass=mat, doctype=doctype, 
+                        serial=serial, sheet=sheet, partner=partner)
+            
+            session.add(document)
+
+            session.flush()
+            session.commit()
+            #session.close()
+
+            return document.id, document.partner
+    except:
+        abort(400,'Please check your file name. - check_Doc')
+
+def precheck_reply(self,item):
+    filename = get_file_original_name(item.file)
+    filename_list = filename.split('-',6)
+    print('len:',len(filename_list), filename_list[6])
+    try:
+        if filename_list[6] != 'CS REP.xlsx':
+            return False, "Something Wrong Whit Your File Name: " + filename_list[6]
+    except:
+        return False, "Something is wrong with your file name. " + filename
+
+
 def check_reply(self, item):
     filename = get_file_original_name(item.file)
     try:
@@ -202,7 +253,7 @@ def check_reply(self, item):
 def check_doc_closed(doc_id):
     doc = models.Document
     document = db.session.query(doc).filter(doc.id==doc_id).first()
-    print('Check Doc Function')
+    print('Check Doc Closed Function')
     
     closed = True
     for com in document.comments:

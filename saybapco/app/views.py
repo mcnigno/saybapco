@@ -3,7 +3,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2, check_duplicates
+from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
@@ -13,7 +13,23 @@ from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
 from mass_update import test_closed, reply_rev, find_action
+from flask import flash, abort, Response
 
+
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 
 #
 #class UploadComments(BaseView):
@@ -22,15 +38,16 @@ from mass_update import test_closed, reply_rev, find_action
 #    def upload(self):
 #        return self.render_template('upload.html')
 class Report(BaseView):
-    @expose('/report/', methods=['POST', 'GET'])
-    def report(self):
-        print('report')
+    default_view = 'fileinfo'
+    @expose('/fileinfo', methods=['POST', 'GET'])
+    def fileinfo(self):
+        print('fileinfo')
         #print(request.submit.value)
         if request.method == 'POST':
             print('post')
             print('POST', request.data) 
     
-        return self.render_template('reports.html')
+        return self.render_template('fileinfo.html')
     
     @expose('/forward/', methods=['POST', 'GET'])
     def forward(self):
@@ -188,10 +205,20 @@ class RevisionView(ModelView):
         return redirect(self.get_redirect())
 
     def pre_add(self,item):
-        item.document_id, item.partner = check_Doc(self, item)
+            
+        print('from views, pre_add function')
+        
         item.reply = check_reply(self, item)
+        item.document_id, item.partner = check_Doc(self, item)
         
         filename = get_file_original_name(item.file)
+        result, message = precheck_doc(self,item)
+        if result == False:
+            print('precheck_doc finction')
+            #return self.render_template('fileinfo.html', param=message)
+            #flash(message, category='warning')
+            
+            return abort(400, message)
         
 
     def post_add(self, item):
@@ -256,14 +283,14 @@ from mass_update import mass_update
 #appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
-#appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
-appbuilder.add_view_no_menu(Report)
+#appbuilder.add_view_no_menu(Report)
 
 #mass_update()
 #set_comments_blank()
