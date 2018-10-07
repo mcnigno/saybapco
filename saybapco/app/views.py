@@ -14,6 +14,7 @@ from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
 from mass_update import test_closed, reply_rev, find_action
 from flask import flash, abort, Response
+from flask_appbuilder.widgets import ListThumbnail, ListBlock
 
 
 class InvalidUsage(Exception):
@@ -73,13 +74,10 @@ class CommentView(ModelView):
         'pretty_comment': 'Comments',
         'pretty_reply': 'Replies',
         'pretty_revision': 'Rev',
-        'pretty_partner': 'Partner',
-
-        'id_c': 'ID-C',
     }
     #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
-    list_columns = ['document','pretty_revision','pretty_style', 'pretty_comment','note',  'pretty_reply', 'pretty_included','pretty_closed']
-
+    list_columns = ['pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    
     #list_widget = ListThumbnail
     
     add_exclude_columns = ['created_on', 'changed_on']
@@ -186,14 +184,33 @@ class RevisionView(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['document', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    #list_columns = ['document','pretty_revision','download']
+    #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
     edit_columns = ['trasmittal', 'revision','date_trs', 'action_code', 'note']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('document.code','asc')
+    order_columns = ['revision','created_on','changed_on']
     related_views = [CommentView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+    show_fieldsets = [
+                        (
+                            'Revision Info',
+                            {'fields': ['document.code', 'revision', 'trasmittal', 'date_trs','action_code', 'note']}
+                        ),
+                        (
+                            'Document Audit',
+                            {'fields': ['created_on',
+                                        'created_by',
+                                        'changed_on',
+                                        'changed_by'], 'expanded':False}
+                        ),
+                     ]
+
+    
 
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -233,6 +250,8 @@ class RevisionView(ModelView):
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
     related_views = [CommentView, RevisionView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
     show_exclude_columns = ['comments']
@@ -247,6 +266,20 @@ class DocumentView(ModelView):
         'count_no_reply': "No Reply",
     }
     list_columns = ['code','partner', 'revision', 'count', 'count_included' ,'count_closed']
+    show_fieldsets = [
+                        (
+                            'Document Info',
+                            {'fields': ['code', 'revision', 'note']}
+                        ),
+                        (
+                            'Document Audit',
+                            {'fields': ['created_on',
+                                        'created_by',
+                                        'changed_on',
+                                        'changed_by'], 'expanded':False}
+                        ),
+                     ]
+
     
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -283,7 +316,7 @@ from mass_update import mass_update
 #appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+#appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
