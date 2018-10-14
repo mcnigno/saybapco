@@ -8,6 +8,7 @@ from flask_appbuilder.filemanager import get_file_original_name
 import openpyxl
 from flask import send_file
 from config import UPLOAD_FOLDER
+import time
  
 errors_list = set()
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -247,12 +248,12 @@ def reply_rev():
 
 
 
+ 
 
-
-def comments(item): 
+def comments(item, folder): 
 
     print('file processed:', str(item.file))
-    file = open(basedir + '/batch/' + get_file_original_name(item.file), mode='rb')
+    file = open(basedir + folder + get_file_original_name(item.file), mode='rb')
     
     #print('file processed:', file)
 
@@ -413,9 +414,9 @@ def check_Doc(item):
 
 
 def mass_update():
-    
-    os.chdir(basedir +'/batch')
-
+    folder = '/CS_PARTE1'
+    os.chdir(basedir +'/CS_PARTE1')
+    folder = folder + '/' #add slash at the end in order to pass to the folder to comment's function
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
     
@@ -425,6 +426,9 @@ def mass_update():
         i = 0
         for file in glob.glob("*.xlsx"):
             i += 1
+            print("Start : %s" % time.ctime())
+            #time.sleep( 5 )
+            print("End : %s" % time.ctime()) 
             print(i, file)
 
             
@@ -465,7 +469,7 @@ def mass_update():
 
 
                     db.session.flush()
-                    comments(new_rev)
+                    comments(new_rev, folder)
                     check_doc_closed(new_rev.document_id)
         
         db.session.commit()

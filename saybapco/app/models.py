@@ -148,7 +148,11 @@ class Revisions(AuditMixin, Model):
             return str(self.document) 
         return str(self.document)
     
-    
+class ResponseCode(AuditMixin, Model):
+    id = Column(Integer, primary_key= True)
+    response_code = Column(String(100), nullable=False)
+
+
 
 class Comments(AuditMixin, Model):
     id = Column(Integer, primary_key= True)

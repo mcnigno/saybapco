@@ -3,6 +3,7 @@ from flask import Flask
 from flask_appbuilder import SQLA, AppBuilder
 from app.index import MyIndexView
 from .momentjs import momentjs
+from flask_migrate import Migrate
 
 """
  Logging configuration
@@ -16,6 +17,7 @@ app.config.from_object('config')
 app.jinja_env.globals['momentjs'] = momentjs
 
 db = SQLA(app)
+migrate = Migrate(app, db)
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView, base_template='mybase.html')
 
 
@@ -32,5 +34,5 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 """    
 
-from app import views
+from app import models, views
 

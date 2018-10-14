@@ -1,5 +1,4 @@
 {
-
+    "python.pythonPath": "sayenv/bin/python"
     //"python.pythonPath": "saybapcoenv/bin/python",
-
 }

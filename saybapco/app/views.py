@@ -193,7 +193,8 @@ class RevisionView(ModelView):
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('document.code','asc')
-    order_columns = ['revision','created_on','changed_on']
+    
+    order_columns = ['document','created_on','changed_on']
     related_views = [CommentView]
     show_template = 'appbuilder/general/model/show_cascade.html'
     show_fieldsets = [
@@ -311,7 +312,7 @@ def page_not_found(e):
 
 
 
-db.create_all()
+#db.create_all()
 from mass_update import mass_update
 #appbuilder.security_cleanup()
 
