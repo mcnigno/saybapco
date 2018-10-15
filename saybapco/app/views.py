@@ -385,7 +385,7 @@ class DocumentView(ModelView):
         else:
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
-
+    '''
     @action("check", "Check", "Check all Really?", "fa-rocket")
     def check(self, items):
         if isinstance(items, list):
@@ -400,6 +400,7 @@ class DocumentView(ModelView):
     def chec_rev(self, item):
         last_rev(self, item)
         return redirect(self.get_redirect())
+    '''
 """
     Application wide 404 error handler
 """
