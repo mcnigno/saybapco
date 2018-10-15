@@ -411,7 +411,7 @@ def page_not_found(e):
 
 
 
-db.create_all()
+#db.create_all()
 from mass_update import mass_update
 #appbuilder.security_cleanup()
 
