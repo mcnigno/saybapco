@@ -54,5 +54,15 @@ body {
 table {
     font-size: 14px;
 }
+p#rev{
+    text-align: center;
+    
 
+}
+p#rev_current{
+    text-align: center;
+    color: #ffffff;
+    background-color: #4b1f68
+
+}
 

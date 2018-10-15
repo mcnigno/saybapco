@@ -117,6 +117,8 @@ class Revisions(AuditMixin, Model):
     document = relationship(Document, backref='revision')
     reply = Column(Boolean, default=False)
     action_code = Column(String(100))
+    pos = Column(Integer, default=0)
+    current = Column(Boolean, default=False)
     
     def __repr__(self):
         if self.reply:
@@ -139,9 +141,21 @@ class Revisions(AuditMixin, Model):
         return self.date_trs.strftime('%d, %b %Y')
     
     def pretty_revision(self):
+
+        revision = self.revision
+
         if self.reply:
-            return self.revision +"-Reply"
-        return self.revision
+            revision = self.revision + '-Reply'
+
+        p_revision = Markup('<p id="rev">'+ revision + '</p>')
+
+        if self.current:
+            p_revision = Markup('<p id="rev_current">'+ revision + '</p>')
+        
+        
+        return p_revision 
+        
+        #return revision = Markup('<p id="rev">'+ self.revision + '</p>')
     
     def pretty_doc_revision(self):
         if self.reply:

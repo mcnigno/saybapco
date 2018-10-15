@@ -3,7 +3,10 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
-from helpers import comments, check_Doc, check_reply, set_comments_blank, set_comments_included, report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc
+from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
+                    report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
+                    set_current
+                    )
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
@@ -12,9 +15,10 @@ from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
-from mass_update import test_closed, reply_rev, find_action
+from mass_update import test_closed, reply_rev, find_action, last_rev
 from flask import flash, abort, Response
 from flask_appbuilder.widgets import ListThumbnail, ListBlock
+
 
 
 class InvalidUsage(Exception):
@@ -170,6 +174,97 @@ class CommentsPieChart(GroupByChartView):
         }
         ]
 
+class RevisionList(ModelView):
+    datamodel = SQLAInterface(Revisions)
+    search_columns = ['document','revision','reply', 'trasmittal','date_trs']
+    label_columns = {
+        'document': 'Bapco Code',
+        'action_code': 'Response Code',
+        'document.code': 'Bapco Code',
+        'pretty_revision': 'Rev.',
+        'pretty_doc_revision': 'Document',
+        'pretty_date': 'Date',
+        'pretty_date_trs': 'Trans. Date',
+        'download': 'File',
+        'trasmittal': 'Transmittal'
+    }
+    list_columns = ['pos','pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    #list_columns = ['document','pretty_revision','download']
+    #list_widget = ListThumbnail
+    add_exclude_columns = ['created_on', 'changed_on']
+    edit_exclude_columns = ['created_on', 'changed_on']
+    edit_columns = ['pos', 'revision','trasmittal','date_trs', 'action_code', 'note']
+    add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
+    show_exclude_columns = ['comments']
+    base_order = ('pos','asc')
+    
+    order_columns = ['document','created_on','changed_on']
+    related_views = [CommentView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+    show_fieldsets = [
+                        (
+                            'Revision Info',
+                            {'fields': ['document.code', 'revision', 'trasmittal', 'date_trs','action_code', 'note']}
+                        ),
+                        (
+                            'Revision Audit',
+                            {'fields': ['created_on',
+                                        'created_by',
+                                        'changed_on',
+                                        'changed_by'], 'expanded':False}
+                        ),
+                     ]
+
+    
+
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+    '''
+    @action("check_Rev", "Check Last Rev", "Check all Really?", "fa-rocket")
+    def chec_rev(self, item):
+        last_rev(self, item)
+        self.update_redirect()
+        return redirect(self.get_redirect())
+    '''
+    @action("current", "Current Revision", "Set This Revision as Current?", "fa-rocket")
+    def current(self, item):
+        item = item[0]
+        item.document_id, item.partner = check_Doc(self, item) 
+        set_current(self, item)
+        self.update_redirect()
+        return redirect(self.get_redirect())
+
+    def pre_add(self,item):
+            
+        print('from views, pre_add function')
+        
+        item.reply = check_reply(self, item)
+        item.document_id, item.partner = check_Doc(self, item)
+        
+        filename = get_file_original_name(item.file)
+        result, message = precheck_doc(self,item)
+        if result == False:
+            print('precheck_doc finction')
+            #return self.render_template('fileinfo.html', param=message)
+            #flash(message, category='warning')
+            
+            return abort(400, message)
+        
+
+    def post_add(self, item):
+        
+        print('post add functions on revision')
+        
+        comments(item)
+        check_doc_closed(item.document_id)
+    
+
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
     search_columns = ['document','revision','reply', 'trasmittal','date_trs']
@@ -184,7 +279,7 @@ class RevisionView(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['document', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
@@ -250,7 +345,7 @@ class RevisionView(ModelView):
 
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
-    related_views = [CommentView, RevisionView]
+    related_views = [CommentView, RevisionList]
     show_template = 'appbuilder/general/model/show_cascade.html'
 
     add_exclude_columns = ['created_on', 'changed_on','comments']
@@ -300,7 +395,11 @@ class DocumentView(ModelView):
         else:
             test_closed(items.id)
         return redirect(self.get_redirect())
-
+    
+    @action("check_Rev", "Check Rev", "Check all Really?", "fa-rocket")
+    def chec_rev(self, item):
+        last_rev(self, item)
+        return redirect(self.get_redirect())
 """
     Application wide 404 error handler
 """
@@ -312,7 +411,7 @@ def page_not_found(e):
 
 
 
-#db.create_all()
+db.create_all()
 from mass_update import mass_update
 #appbuilder.security_cleanup()
 
@@ -321,12 +420,13 @@ from mass_update import mass_update
 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view_no_menu(RevisionList) 
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
-#appbuilder.add_view_no_menu(Report)
 
-#mass_update()
+
+mass_update()  
 #set_comments_blank()
 #set_comments_included()
 #transmittall()

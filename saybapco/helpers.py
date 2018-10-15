@@ -9,6 +9,9 @@ import uuid
 from flask import render_template, abort
 
 
+rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
+                'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
+
 def parse_escaped_character_match(match):
     return chr(int(match.group(1), 16))
 
@@ -53,7 +56,7 @@ def check_duplicates():
 
 def comments(item):
     try:
-        #print('file processed:', str(item.file))
+        print('file processed:', str(item.file))
         
         #print('file processed:', file)
 
@@ -97,6 +100,7 @@ def comments(item):
         #print('the comments len is:', len(comm_list))
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
         #print('delete query executed')
+        
     except:
         abort(400,'Please check your Excel file format.')
     
@@ -105,9 +109,12 @@ def comments(item):
     #check columns label
     #for row in ws.iter_colum()
     #print('document id', item.document_id,'revision:', item.id)
+    
     partner = item.partner
+    print('here')
     #revision = item.revision
     try:
+        
         for row in ws.iter_rows(min_row=2):
             #print(row[0].value, row[1].value, row[2].value,
                 #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
@@ -160,6 +167,49 @@ def comments(item):
     
     return 'done'
 
+def last_rev(self, item):
+
+    # trova tutte le revisioni per il documento
+    doc = item.document
+    rev = item.revision
+    print('last rev function:')
+    print('document ID', doc.id)
+    print('revisions', doc.revision)
+    print('doc rev', rev)
+    print('is a reply?', item.reply)
+    #revisions = db.session.query(models.Revisions).filter(models.Revisions.document_id == item.id).all()
+    #print('revision list', revisions)
+    cur_rev_index = rev_order.index(rev)
+    doc_rev_index_list = []
+    for rev in item.revision:
+        doc_rev_index_list.append(rev_order.index(rev))
+    if cur_rev_index < max(doc_rev_index_list):
+        print('This REV is SUPERSEEDED')
+
+def set_current(self, item):
+    print(item.document)
+    doc = item.document
+    try:
+        print(doc.id)
+        #print(doc.document_id)
+        
+        comme = db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
+        print(comme)
+        db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).delete()
+        #db.session.query(models.Comments).filter(models.Comments.document_id == item.document_id).delete()
+        
+        print('not here')
+        comments(item)
+
+        for rev in doc.revision:
+            print(rev)
+            rev.current = False
+        item.current = True
+        db.session.commit()
+    except:
+        print('something wrong in set current')
+        pass
+
 def precheck_doc(self, item):
     filename = get_file_original_name(item.file)
     filename_list = filename.split('-',6)
@@ -191,13 +241,21 @@ def precheck_doc(self, item):
     except:
         return False, "Something Wrong Whit Your File Name: " + filename
 
-    
+    try:
+        if this_rev != "A":
+            last_rev(self, revision)
+    except:
+        print('something worng with last rev function')
+        pass
+
     return True, "File uploaded " + filename
 
 def check_Doc(self, item):
     try:
+        print('here in check doc', item.file)
         filename = get_file_original_name(item.file)
         filename_list = filename.split('-',6)
+        
         
         unit = filename[0:3]
         partner = item.trasmittal[4:7]

@@ -8,10 +8,16 @@ from flask_appbuilder.filemanager import get_file_original_name
 import openpyxl
 from flask import send_file
 from config import UPLOAD_FOLDER
-import time
+import time, random
  
 errors_list = set()
 basedir = os.path.abspath(os.path.dirname(__file__))
+rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
+                'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
+
+user_list = [1,2,3]
+
+
 
 def find_action():
     print('report start ***************')
@@ -412,10 +418,34 @@ def check_Doc(item):
 
         return document.id, document.partner
 
+def last_rev(self, item):
+    # trova tutte le revisioni per il documento
+    doc = item.document
+    rev = item.revision
+    print('last rev function:')
+    print('document ID', doc.id)
+    print('revisions', doc.revision)
+    print('doc rev', rev)
+    print('is a reply?', item.reply)
+    #revisions = db.session.query(models.Revisions).filter(models.Revisions.document_id == item.id).all()
+    #print('revision list', revisions)
+    cur_rev_index = rev_order.index(rev)
+    doc_rev_index_list = []
+    for rev in item.revision:
+        doc_rev_index_list.append(rev_order.index(rev))
+    if cur_rev_index < max(doc_rev_index_list):
+        print('This REV is SUPERSEEDED')
+
+
+    
+
+def is_current_rev(revisions, rev):
+    rev_index = rev_order.index(rev)
+
 
 def mass_update():
-    folder = '/CS_PARTE1'
-    os.chdir(basedir +'/CS_PARTE1')
+    folder = '/CS_TEST'
+    os.chdir(basedir + folder)
     folder = folder + '/' #add slash at the end in order to pass to the folder to comment's function
     rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
@@ -452,10 +482,10 @@ def mass_update():
                     shutil.copy(src, dst)
             
 
-
+                user =random.choice(user_list)
                 #print('FILE BYTE', file_byte) 
                 #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file)
                 
                 #new_rev.revision = revision
@@ -465,11 +495,16 @@ def mass_update():
                     print('This Rev Already Exist - Not Added')
                 else:
                     print('exist is there..', exist)
+                    
+                    new_rev.current = 1
+                    new_rev.changed_by_fk = 1
+
                     db.session.add(new_rev)
-
-
+                    
+                    
+                    
                     db.session.flush()
-                    comments(new_rev, folder)
+                    set_current(new_rev)
                     check_doc_closed(new_rev.document_id)
         
         db.session.commit()
@@ -486,7 +521,9 @@ def mass_update():
                 file_byte = open(file, mode='rb') 
                 file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
                 #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = 1, changed_by_fk = 1, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
+                
+                user =random.choice(user_list)
+                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
                 new_rev.document_id, new_rev.partner = check_Doc(file) 
                 #print('the new rev id is:', new_rev.document_id)
                 
@@ -497,16 +534,59 @@ def mass_update():
                     print('This Rev Already Exist - Not Added')
                 else:
                     print('exist is there..', exist)
-                    db.session.add(new_rev)
-                    db.session.flush()
-                    comments(new_rev)
-                    check_doc_closed(new_rev.document_id)
+                    new_rev.current = 1
+                    new_rev.changed_by_fk = 1
 
+                    db.session.add(new_rev)
+                    
+                    db.session.flush()
+                    set_current(new_rev)
+                    check_doc_closed(new_rev.document_id)
+ 
                 #print(file)
             
                 #print('REV NOT FOUND', rev[1], file)
         db.session.commit()
         db.session.close()
-    
+     
 
+def set_current(item):
+    print(item.document)
+    doc = item.document
 
+    try:
+        print(doc.id)
+        #print(doc.document_id)
+        
+        #comme = db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
+        #print(comme)
+        db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).delete()
+        #db.session.query(models.Comments).filter(models.Comments.document_id == item.document_id).delete()
+        
+        
+        folder = '/CS_TEST'
+        folder = folder + '/' #add slash at the end in order to pass to the folder to comment's function
+        comments(item, folder) 
+        print('not here')
+        current_post(item) 
+        
+
+        
+        #item.changed_by_fk = 1
+
+        db.session.commit()  
+
+    except:
+        print('something wrong in func - set current')
+        pass
+
+ 
+def current_post(item):
+
+    doc = item.document
+    for rev in doc.revision:
+            print(rev)
+            rev.current = False
+            rev.changed_by_fk = 1
+            db.session.commit()
+    item.current = True
