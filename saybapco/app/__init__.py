@@ -4,6 +4,7 @@ from flask_appbuilder import SQLA, AppBuilder
 from app.index import MyIndexView
 from .momentjs import momentjs
 from flask_migrate import Migrate
+import os
 
 """
  Logging configuration
@@ -17,7 +18,10 @@ app.config.from_object('config')
 app.jinja_env.globals['momentjs'] = momentjs
 
 db = SQLA(app)
-migrate = Migrate(app, db)
+MIGRATION_DIR = 'migrations'
+
+
+migrate = Migrate(app, db, directory=MIGRATION_DIR)
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView, base_template='mybase.html')
 
 
