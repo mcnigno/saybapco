@@ -7,6 +7,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 import uuid
 #from views import Report
 from flask import render_template, abort
+import time
 
 
 rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
@@ -86,7 +87,7 @@ def comments(item):
     try:
         print(UPLOAD_FOLDER)
         file = open(UPLOAD_FOLDER + item.file, mode='rb')
-        print('arianna is here')
+        
         print(UPLOAD_FOLDER)
         wb = openpyxl.load_workbook(file)
         ws = wb.active
@@ -411,7 +412,19 @@ def set_comments_included():
     print('closed_by_included', closed_by_included)
     session.close()
 
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0))
+
+        return ret
+    return wrap
+
+@timing
 def report_all():
+    #print('start', time.time())
     file_template = UPLOAD_FOLDER + 'report/cs_dashboard.xlsx'
     filepath = UPLOAD_FOLDER + 'report/' + str(uuid.uuid4()) + 'cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(file_template)
@@ -458,7 +471,8 @@ def report_all():
 
     
     revisions = db.session.query(revision).all()
-    
+    start = time.time()
+    #print('revision query done', time.time())
     
     _ = wr.cell(column=1, row=1, value='ID')
     _.font = ft
@@ -492,7 +506,8 @@ def report_all():
         _ = wr.cell(column=8, row=row, value=str(revision.current))
 
         row += 1
-    
+    rev_time = time.time()
+    #print('write revision sheet', time.time)
     wr.column_dimensions['A'].width = 5
     wr.column_dimensions['B'].width = 35
     wr.column_dimensions['D'].width = 20
@@ -547,6 +562,11 @@ def report_all():
         
 
         row += 1
+    
+    doc_time = time.time()
+    #print('write document sheet', time.time())
+    print('write revision took {:.3f} ms'.format((rev_time-start)*1000.0))
+    print('write document took {:.3f} ms'.format((doc_time-rev_time)*1000.0))
 
     wd.column_dimensions['A'].width = 5
     wd.column_dimensions['B'].width = 20
@@ -567,7 +587,10 @@ def report_all():
     file = filepath
     #print(file.name)
     db.session.close()
+    
     return file
+
+
 
 def check_doc_closed2():
     doc = models.Document
