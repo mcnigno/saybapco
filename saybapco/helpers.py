@@ -303,7 +303,6 @@ def precheck_reply(self,item):
     except:
         return False, "Something is wrong with your file name. " + filename
 
-
 def check_reply(self, item):
     filename = get_file_original_name(item.file)
     try:
@@ -374,7 +373,6 @@ def set_comments_blank():
     print('vuoti in reply', blank_reply)
     session.close()
     
-
 def set_comments_included():
     comment = models.Comments
     revision = models.Revisions
@@ -418,11 +416,11 @@ def report_all():
     filepath = UPLOAD_FOLDER + 'report/' + str(uuid.uuid4()) + 'cs_dashboard.xlsx'
     workbook = openpyxl.load_workbook(file_template)
     
-    comment = models.Comments
+    #comment = models.Comments
     revision = models.Revisions
     document = models.Document
 
-    wc = workbook['Comments']    
+    #wc = workbook['Comments']    
     wr = workbook['Revisions']
     wd = workbook['Documents']
 
@@ -461,20 +459,45 @@ def report_all():
     
     revisions = db.session.query(revision).all()
     
-    row = 1
+    
+    _ = wr.cell(column=1, row=1, value='ID')
+    _.font = ft
+    _ = wr.cell(column=2, row=1, value='FileName')
+    _.font = ft
+    _ = wr.cell(column=3, row=1, value='Revision')
+    _.font = ft
+    _ = wr.cell(column=4, row=1, value='Transmittal')
+    _.font = ft
+    _ = wr.cell(column=5, row=1, value='Trans. Date')
+    _.font = ft
+    _ = wr.cell(column=6, row=1, value='Response Code')
+    _.font = ft
+    _ = wr.cell(column=7, row=1, value='Note')
+    _.font = ft
+    _ = wr.cell(column=8, row=1, value='Current')
+    _.font = ft
+
+
+    row = 2
     col = 1 
 
     for revision in revisions:
         _ = wr.cell(column=1, row=row, value=str(revision.id))
-        _ = wr.cell(column=2, row=row, value=str(revision.file))
+        _ = wr.cell(column=2, row=row, value=str(revision.file_name()))
         _ = wr.cell(column=3, row=row, value=str(revision.revision))
         _ = wr.cell(column=4, row=row, value=str(revision.trasmittal))
         _ = wr.cell(column=5, row=row, value=str(revision.date_trs))
-        _ = wr.cell(column=6, row=row, value=str(revision.document))
-        _ = wr.cell(column=7, row=row, value=str(revision.reply))
+        _ = wr.cell(column=6, row=row, value=str(revision.action_code))
+        _ = wr.cell(column=7, row=row, value=str(revision.note))
+        _ = wr.cell(column=8, row=row, value=str(revision.current))
 
         row += 1
-
+    
+    wr.column_dimensions['A'].width = 5
+    wr.column_dimensions['B'].width = 35
+    wr.column_dimensions['D'].width = 20
+    wr.column_dimensions['F'].width = 35
+    wr.column_dimensions['G'].width = 35
     # 
     # Populate documents Sheet
     #
@@ -494,7 +517,11 @@ def report_all():
     _.font = ft
     _ = wd.cell(column=4, row=1, value='Revisions')
     _.font = ft
-    _ = wd.cell(column=5, row=1, value='Open CS')
+    _ = wd.cell(column=5, row=1, value='Open')
+    _.font = ft
+    _ = wd.cell(column=6, row=1, value='Included')
+    _.font = ft
+    _ = wd.cell(column=7, row=1, value='Closed')
     _.font = ft
     
     
@@ -507,7 +534,7 @@ def report_all():
     
 
     for document in documents:
-        doc = [document.id, document.name(), document.partner, str(document.revision), document.count_open()]
+        doc = [document.id, document.name(), document.partner, str(document.revision), document.count_open(), document.count_included(), document.count_closed()]
         wd.append(doc)
         
         '''
@@ -520,6 +547,14 @@ def report_all():
         
 
         row += 1
+
+    wd.column_dimensions['A'].width = 5
+    wd.column_dimensions['B'].width = 20
+    wd.column_dimensions['D'].width = 35
+    wd.column_dimensions['E'].width = 8
+    wd.column_dimensions['F'].width = 8
+    wd.column_dimensions['G'].width = 8
+
     wd.page_setup.fitToWidth = 1
     
     tab = Table(displayName='Documents', ref='A1:E'+ str(row))

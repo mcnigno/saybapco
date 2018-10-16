@@ -35,7 +35,7 @@ class InvalidUsage(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
-
+       
 #
 #class UploadComments(BaseView):
 #    default_view = 'upload'
@@ -404,7 +404,7 @@ class DocumentView(ModelView):
 """
     Application wide 404 error handler
 """
-
+ 
 @appbuilder.app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404##
@@ -417,7 +417,7 @@ from mass_update import mass_update
 #appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
-#appbuilder.add_view(Report,'Reports',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
+appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-code-branch", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
