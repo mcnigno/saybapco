@@ -549,16 +549,18 @@ def report_all():
     
 
     for document in documents:
-        doc = [document.id, document.name(), document.partner, str(document.revision), document.count_open(), document.count_included(), document.count_closed()]
-        wd.append(doc)
+        #doc = [document.id, document.name(), document.partner, str(document.revision), document.count_open(), document.count_included(), document.count_closed()]
+        #wd.append(doc)
         
-        '''
+        
         _ = wd.cell(column=1, row=row, value=str(document.id))
         _ = wd.cell(column=2, row=row, value=str(document.name()))
         _ = wd.cell(column=3, row=row, value=str(document.partner))
         _ = wd.cell(column=4, row=row, value=str(document.revision))
         _ = wd.cell(column=5, row=row, value=str(document.count_open()))
-        '''
+        _ = wd.cell(column=6, row=row, value=str(document.count_included()))
+        _ = wd.cell(column=7, row=row, value=str(document.count_closed()))
+     
         
 
         row += 1
