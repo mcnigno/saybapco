@@ -78,11 +78,16 @@ def comments(item):
         if filename[-8:-5] == "REP":
             print('Reply identification: ', filename[-8:-5] )
             type_reply = True
+            
+            
     except:
         abort(400,'Please check your file name.')
     
     try:
+        print(UPLOAD_FOLDER)
         file = open(UPLOAD_FOLDER + item.file, mode='rb')
+        print('arianna is here')
+        print(UPLOAD_FOLDER)
         wb = openpyxl.load_workbook(file)
         ws = wb.active
 
@@ -187,20 +192,21 @@ def last_rev(self, item):
         print('This REV is SUPERSEEDED')
 
 def set_current(self, item):
+    print('set current function start')
     print(item.document)
     doc = item.document
     try:
         print(doc.id)
         #print(doc.document_id)
         
-        comme = db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
-        print(comme)
+        #comme = db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
+        #print(comme)
         db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).delete()
         #db.session.query(models.Comments).filter(models.Comments.document_id == item.document_id).delete()
         
         print('not here')
         comments(item)
-
+        print(doc.revision)
         for rev in doc.revision:
             print(rev)
             rev.current = False
