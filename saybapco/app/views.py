@@ -556,7 +556,7 @@ appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(MyRevisionsList,'My Revisions List',icon="fas fa-sort-amount-up", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(DocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(SuperDocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
 
 appbuilder.add_view_no_menu(RevisionList) 
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
