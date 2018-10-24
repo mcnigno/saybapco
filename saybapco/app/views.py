@@ -14,7 +14,7 @@ from flask_appbuilder.filemanager import get_file_original_name
 from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
-from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual
+from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
 from mass_update import test_closed, reply_rev, find_action, last_rev
 from flask import flash, abort, Response, g
 from flask_appbuilder.widgets import ListThumbnail, ListBlock
@@ -438,6 +438,55 @@ class DocumentView(ModelView):
     show_exclude_columns = ['comments']
     search_exclude_columns = ['created_on', 'changed_on']
     search_columns = ['partner', 'code' ]
+
+    base_filters = [['partner', FilterNotContains, "SOC"],
+                    ['partner', FilterNotContains, "MOC"]]
+
+    label_columns = {
+        'code': 'Bapco Code',
+        'count': 'Tot',
+        'count_included': 'Included',
+        'count_closed': 'Closed',
+        'count_open': 'Open',
+        'count_no_reply': "No Reply",
+    }
+    list_columns = ['code','partner', 'revision', 'count', 'count_included' ,'count_closed']
+    show_fieldsets = [
+                        (
+                            'Document Info',
+                            {'fields': ['code', 'revision', 'partner']}
+                        ),
+                        (
+                            'Document Audit',
+                            {'fields': ['created_on',
+                                        'created_by',
+                                        'changed_on',
+                                        'changed_by'], 'expanded':False}
+                        ),
+                     ]
+
+    
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
+class SuperDocumentView(ModelView):
+    datamodel = SQLAInterface(Document)
+    related_views = [CommentView, RevisionList]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
+    add_exclude_columns = ['created_on', 'changed_on','comments']
+    edit_exclude_columns = ['created_on', 'changed_on','comments']
+    show_exclude_columns = ['comments']
+    search_exclude_columns = ['created_on', 'changed_on']
+    search_columns = ['partner', 'code' ]
+    
+
     label_columns = {
         'code': 'Bapco Code',
         'count': 'Tot',
@@ -507,6 +556,8 @@ appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(MyRevisionsList,'My Revisions List',icon="fas fa-sort-amount-up", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(DocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+
 appbuilder.add_view_no_menu(RevisionList) 
 appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
