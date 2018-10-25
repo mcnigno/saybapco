@@ -193,7 +193,7 @@ class RevisionList(ModelView):
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
-    edit_exclude_columns = ['created_on', 'changed_on']
+    edit_exclude_columns = ['created_on', 'changed_on', 'file']
     edit_columns = ['pos', 'revision','trasmittal','date_trs', 'action_code', 'note']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
