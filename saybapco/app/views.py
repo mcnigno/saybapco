@@ -194,7 +194,7 @@ class RevisionList(ModelView):
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    edit_columns = ['file','pos', 'revision','trasmittal','date_trs', 'action_code', 'note']
+    edit_columns = ['pos', 'revision','trasmittal','date_trs', 'action_code', 'note']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('pos','asc')
@@ -264,7 +264,73 @@ class RevisionList(ModelView):
         
         comments(item)
         check_doc_closed(item.document_id)
+
+class RevisionFileChange(ModelView):
+    datamodel = SQLAInterface(Revisions)
+    search_columns = ['document','revision','reply', 'trasmittal','date_trs']
+    label_columns = {
+        'document': 'Bapco Code',
+        'action_code': 'Response Code',
+        'document.code': 'Bapco Code',
+        'pretty_revision': 'Rev.',
+        'pretty_doc_revision': 'Document',
+        'pretty_date': 'Date',
+        'pretty_date_trs': 'Trans. Date',
+        'download': 'File',
+        'trasmittal': 'Transmittal'
+    }
+    list_columns = ['pos','pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    #list_columns = ['document','pretty_revision','download']
+    #list_widget = ListThumbnail
+    base_permissions = ['can_edit', 'can_list']
+    add_exclude_columns = ['created_on', 'changed_on']
+    edit_exclude_columns = ['created_on', 'changed_on']
+    edit_columns = ['file']
+    add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
+    show_exclude_columns = ['comments']
+    base_order = ('pos','asc')
     
+    order_columns = ['document','created_on','changed_on']
+    related_views = [CommentView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+    show_fieldsets = [
+                        (
+                            'Revision Info',
+                            {'fields': ['document.code', 'revision', 'trasmittal', 'date_trs','action_code', 'note']}
+                        ),
+                        (
+                            'Revision Audit',
+                            {'fields': ['created_on',
+                                        'created_by',
+                                        'changed_on',
+                                        'changed_by'], 'expanded':False}
+                        ),
+                     ]
+
+    def pre_add(self,item):
+            
+        print('from views, pre_add function')
+        
+        item.reply = check_reply(self, item)
+        item.document_id, item.partner = check_Doc(self, item)
+        
+        filename = get_file_original_name(item.file)
+        result, message = precheck_doc(self,item)
+        if result == False:
+            print('precheck_doc finction')
+            #return self.render_template('fileinfo.html', param=message)
+            #flash(message, category='warning')
+            
+            return abort(400, message)
+        
+
+    def post_add(self, item):
+        
+        print('post add functions on revision')
+
+        comments(item)
+        check_doc_closed(item.document_id)
+
 class MyRevisionsList(ModelView):
     
     datamodel = SQLAInterface(Revisions)
@@ -552,8 +618,10 @@ from mass_update import mass_update
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
-
+ 
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(RevisionFileChange,'Revision File Change',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
+
 appbuilder.add_view(MyRevisionsList,'My Revisions List',icon="fas fa-sort-amount-up", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(SuperDocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
