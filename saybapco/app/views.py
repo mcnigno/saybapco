@@ -279,7 +279,7 @@ class RevisionFileChange(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['pos','pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['pos','document', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
     base_permissions = ['can_edit', 'can_list']
