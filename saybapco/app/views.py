@@ -285,7 +285,7 @@ class RevisionFileChange(ModelView):
     base_permissions = ['can_edit', 'can_list']
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    edit_columns = ['file']
+    edit_columns = ['file', 'reply']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('pos','asc')
