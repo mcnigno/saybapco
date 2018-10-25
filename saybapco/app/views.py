@@ -279,7 +279,7 @@ class RevisionFileChange(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['pos','document', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
     base_permissions = ['can_edit', 'can_list']
@@ -288,7 +288,7 @@ class RevisionFileChange(ModelView):
     edit_columns = ['file', 'reply']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
-    base_order = ('pos','asc')
+    base_order = ('document.code', 'asc')
     
     order_columns = ['document','created_on','changed_on']
     related_views = [CommentView]
