@@ -229,7 +229,8 @@ def precheck_doc(self, item):
          
         rev = models.Revisions
         this_reply = False
-        if filename_list[6] == 'CS REP.xlsx':
+        rep_extension_list = ['CS REP.xlsx', 'CS REP.xls', 'CS REP.XLS', 'CS REP.XLSX']
+        if filename_list[6] in rep_extension_list:
             this_reply = True
         
         print('rev.reply == item.reply',rev.reply, item.reply)
