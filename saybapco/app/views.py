@@ -418,7 +418,7 @@ class MyRevisionsList(ModelView):
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Revisions)
-    search_columns = ['document','revision','reply', 'trasmittal','date_trs']
+    search_columns = ['document','revision','reply', 'trasmittal','date_trs','action_code', 'note']
     label_columns = {
         'document': 'Bapco Code',
         'action_code': 'Bapco Response Code',
