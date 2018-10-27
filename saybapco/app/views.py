@@ -430,6 +430,9 @@ class RevisionView(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
+    base_filters = [['partner', FilterNotContains, "SOC"],
+                    ['partner', FilterNotContains, "MOC"]]
+                    
     list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
