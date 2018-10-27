@@ -162,6 +162,11 @@ class Revisions(AuditMixin, Model):
             return str(self.document) 
         return str(self.document)
     
+    def partner(self):
+        doc = self.document
+        my_partner = doc.partner
+        return my_partner
+
 class ResponseCode(AuditMixin, Model):
     id = Column(Integer, primary_key= True)
     response_code = Column(String(100), nullable=False)
