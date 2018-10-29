@@ -165,7 +165,7 @@ class Revisions(AuditMixin, Model):
     def partner(self):
         doc = self.document
         my_partner = doc.partner
-        return my_partner
+        return my_partner     
 
 class ResponseCode(AuditMixin, Model):
     id = Column(Integer, primary_key= True)

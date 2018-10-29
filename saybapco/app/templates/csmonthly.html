@@ -1,0 +1,56 @@
+{% extends "appbuilder/base.html" %}
+{% block content %}
+
+<h2>Comment Sheets Status by Month</h2>
+<br>
+<br>
+
+<div class="jumbotron" style="text-align:center">
+  <div class="container">
+    
+    <h3>CS Status Chart</h3>
+
+    <br>
+    <br>
+
+    <iframe
+  width="800"
+  height="400"
+  seamless
+  frameBorder="0"
+  scrolling="no"
+  src="https://report.quasarpm.com/superset/explore/?form_data=%7B%22datasource%22%3A%2262__table%22%2C%22viz_type%22%3A%22bar%22%2C%22slice_id%22%3A154%2C%22granularity_sqla%22%3A%22TransmDate%22%2C%22time_grain_sqla%22%3A%22P1M%22%2C%22since%22%3A%221+years+ago%22%2C%22until%22%3A%22now%22%2C%22metrics%22%3A%5B%7B%22column%22%3A%7B%22groupby%22%3Atrue%2C%22optionName%22%3A%22_col_RevID%22%2C%22expression%22%3A%22%22%2C%22is_dttm%22%3Afalse%2C%22filterable%22%3Atrue%2C%22type%22%3A%22INT%22%2C%22description%22%3Anull%2C%22column_name%22%3A%22RevID%22%2C%22verbose_name%22%3Anull%7D%2C%22optionName%22%3A%22metric_d7tk9f36rw_u15a0lkv5%22%2C%22expressionType%22%3A%22SIMPLE%22%2C%22label%22%3A%22COUNT%28RevID%29%22%2C%22sqlExpression%22%3Anull%2C%22aggregate%22%3A%22COUNT%22%2C%22hasCustomLabel%22%3Afalse%2C%22fromFormData%22%3Afalse%7D%5D%2C%22groupby%22%3A%5B%22BapcoResponse%22%5D%2C%22timeseries_limit_metric%22%3Anull%2C%22order_desc%22%3Atrue%2C%22contribution%22%3Afalse%2C%22color_scheme%22%3A%22bnbColors%22%2C%22show_brush%22%3A%22yes%22%2C%22show_legend%22%3Atrue%2C%22show_bar_value%22%3Atrue%2C%22rich_tooltip%22%3Atrue%2C%22bar_stacked%22%3Atrue%2C%22line_interpolation%22%3A%22basis%22%2C%22show_controls%22%3Atrue%2C%22bottom_margin%22%3A%22auto%22%2C%22x_axis_label%22%3A%22Transmittal+Date%22%2C%22x_ticks_layout%22%3A%22auto%22%2C%22x_axis_format%22%3A%22smart_date%22%2C%22x_axis_showminmax%22%3Afalse%2C%22reduce_x_ticks%22%3Afalse%2C%22y_axis_label%22%3A%22Number+of+Comment+Sheets%22%2C%22left_margin%22%3A%22auto%22%2C%22y_axis_showminmax%22%3Afalse%2C%22y_log_scale%22%3Afalse%2C%22y_axis_format%22%3A%22.3s%22%2C%22y_axis_bounds%22%3A%5Bnull%2Cnull%5D%2C%22rolling_type%22%3A%22None%22%2C%22time_compare%22%3Anull%2C%22num_period_compare%22%3A%22%22%2C%22period_ratio_type%22%3A%22growth%22%2C%22resample_how%22%3Anull%2C%22resample_rule%22%3Anull%2C%22resample_fillmethod%22%3Anull%2C%22annotation_layers%22%3A%5B%5D%2C%22where%22%3A%22%22%2C%22having%22%3A%22%22%2C%22filters%22%3A%5B%7B%22col%22%3A%22IsReply%22%2C%22op%22%3A%22%3D%3D%22%2C%22val%22%3A%220%22%7D%5D%2C%22pandas_aggfunc%22%3A%22sum%22%2C%22combine_metric%22%3Afalse%2C%22columns%22%3A%5B%22BapcoResponse%22%5D%2C%22url_params%22%3A%7B%7D%2C%22pivot_margins%22%3Atrue%2C%22number_format%22%3A%22.3s%22%2C%22row_limit%22%3A10000%7D&standalone=true&height=400"
+>
+</iframe>
+
+    <h3>CS Status Summary </h3>
+
+    <iframe
+  width="800"
+  height="400"
+  seamless
+  frameBorder="0"
+  scrolling="no"
+  src="https://report.quasarpm.com/superset/explore/?form_data=%7B%22datasource%22%3A%2262__table%22%2C%22viz_type%22%3A%22pivot_table%22%2C%22slice_id%22%3A153%2C%22granularity_sqla%22%3A%22TransmDate%22%2C%22time_grain_sqla%22%3A%22P1M%22%2C%22since%22%3A%221+years+ago%22%2C%22until%22%3A%22now%22%2C%22groupby%22%3A%5B%22Year%22%2C%22BapcoResponse%22%5D%2C%22columns%22%3A%5B%5D%2C%22metrics%22%3A%5B%22Total+CS%22%5D%2C%22row_limit%22%3A10000%2C%22pandas_aggfunc%22%3A%22sum%22%2C%22pivot_margins%22%3Atrue%2C%22number_format%22%3A%22.3s%22%2C%22combine_metric%22%3Afalse%2C%22where%22%3A%22%22%2C%22having%22%3A%22%22%2C%22filters%22%3A%5B%7B%22col%22%3A%22IsReply%22%2C%22op%22%3A%22%3D%3D%22%2C%22val%22%3A%220%22%7D%5D%2C%22url_params%22%3A%7B%7D%7D&standalone=true&height=400"
+>
+</iframe>
+   <br>
+    <img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64">
+    
+    <h3>{{_("Excel Reporting")}}</h3>
+    <br>
+    <br>
+   
+    <form action="/report/csmonthly_rep/" method="post">
+        <button class="btn btn-success" name="forwardBtn" type="submit">Download Report</button>
+        
+    </form>
+    <br>
+    <br>
+    
+
+  </div>
+</div>
+
+
+{% endblock %}

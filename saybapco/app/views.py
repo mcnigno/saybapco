@@ -5,7 +5,7 @@ from app import appbuilder, db
 from .models import Document, Comments, Revisions
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
-                    set_current
+                    set_current, report_url
                     )
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
@@ -52,7 +52,7 @@ class Report(BaseView):
         if request.method == 'POST':
             print('post')
             print('POST', request.data) 
-    
+        #report_url(self)
         return self.render_template('fileinfo.html')
     
     @expose('/forward/', methods=['POST', 'GET'])
@@ -62,6 +62,52 @@ class Report(BaseView):
         if request.method == 'POST':        
             print('forward')
             print('forward')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
+
+class CsRepliesView(BaseView):
+    default_view = 'csreplies'
+    @expose('/csreplies', methods=['POST', 'GET'])
+    def csreplies(self):
+        print('csreplies')
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('csreplies.html')
+    
+    @expose('/csreplies_rep/', methods=['POST', 'GET'])
+    def csreplies_rep(self):
+        print('csreplies_rep')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('csreplies_rep')
+            print('csreplies_rep')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
+
+class CsMonthView(BaseView):
+    default_view = 'csmonthly'
+    @expose('/csmonthly', methods=['POST', 'GET'])
+    def csmonthly(self):
+        print('csmonthly')
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('csmonthly.html')
+    
+    @expose('/csmonthly_rep/', methods=['POST', 'GET'])
+    def csmonthly_rep(self):
+        print('csmonthly_rep')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('csmonthly_rep')
+            print('csmonthly_rep')
             ws = report_all()
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
@@ -614,15 +660,17 @@ def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404##
 
 
-
-
+       
+        
 #db.create_all()
 from mass_update import mass_update
 #appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
- 
+appbuilder.add_view(CsRepliesView,'CS Replies Status',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
+appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
+
 appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_view(RevisionFileChange,'Revision File Change',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
 

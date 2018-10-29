@@ -1,25 +1,20 @@
 {% extends "appbuilder/base.html" %}
 {% block content %}
 
+<h2>Comment Sheets Replies</h2>
+<br>
+<br>
+
 <div class="jumbotron" style="text-align:center">
   <div class="container">
-    <p><img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64"></p>
-    <h2>{{_("Excel Reporting")}}</h2>
-    <br>
-    <br>
-    <form action="/report/forward/" method="post">
-        <button class="btn btn-success" name="forwardBtn" type="submit">Dashboard XLSX</button>
-        
-    </form>
-    <br>
+    
+    <h3>Status of CS Replies</h3>
 
     <br>
-    </form>
-    <h3>Status of CS Replies</h3>
     <br>
-    <br>
+
     <iframe
-  width="600"
+  width="800"
   height="400"
   seamless
   frameBorder="0"
@@ -27,17 +22,32 @@
   src="https://report.quasarpm.com/superset/explore/?form_data=%7B%22datasource%22%3A%2262__table%22%2C%22viz_type%22%3A%22bar%22%2C%22slice_id%22%3A152%2C%22granularity_sqla%22%3A%22TransmDate%22%2C%22time_grain_sqla%22%3A%22P1Y%22%2C%22since%22%3A%222+years+ago%22%2C%22until%22%3A%22now%22%2C%22metrics%22%3A%5B%22Total+CS%22%5D%2C%22groupby%22%3A%5B%22BapcoResponse%22%5D%2C%22timeseries_limit_metric%22%3Anull%2C%22order_desc%22%3Atrue%2C%22contribution%22%3Afalse%2C%22color_scheme%22%3A%22bnbColors%22%2C%22show_brush%22%3A%22auto%22%2C%22show_legend%22%3Atrue%2C%22show_bar_value%22%3Atrue%2C%22rich_tooltip%22%3Atrue%2C%22bar_stacked%22%3Afalse%2C%22line_interpolation%22%3A%22linear%22%2C%22show_controls%22%3Atrue%2C%22bottom_margin%22%3A%22auto%22%2C%22x_axis_label%22%3A%22Transmittal+Date%22%2C%22x_ticks_layout%22%3A%22auto%22%2C%22x_axis_format%22%3A%22smart_date%22%2C%22x_axis_showminmax%22%3Afalse%2C%22reduce_x_ticks%22%3Afalse%2C%22y_axis_label%22%3A%22Number+of+Comment+Sheets%22%2C%22left_margin%22%3A%22auto%22%2C%22y_axis_showminmax%22%3Afalse%2C%22y_log_scale%22%3Afalse%2C%22y_axis_format%22%3A%22.3s%22%2C%22y_axis_bounds%22%3A%5Bnull%2Cnull%5D%2C%22rolling_type%22%3A%22None%22%2C%22time_compare%22%3Anull%2C%22num_period_compare%22%3A%22%22%2C%22period_ratio_type%22%3A%22growth%22%2C%22resample_how%22%3Anull%2C%22resample_rule%22%3Anull%2C%22resample_fillmethod%22%3Anull%2C%22annotation_layers%22%3A%5B%5D%2C%22where%22%3A%22%22%2C%22having%22%3A%22%22%2C%22filters%22%3A%5B%7B%22val%22%3A%5B1%5D%2C%22op%22%3A%22in%22%2C%22col%22%3A%22IsReply%22%7D%5D%7D&standalone=true&height=400"
 >
 </iframe>
-    <h3>Replies Pivot Table </h3>
+
+    <h3>CS Replies Summary </h3>
+
     <iframe
-  width="600"
-  height="400"
+  width="800"
+  height="100%"
   seamless
   frameBorder="0"
   scrolling="no"
   src="https://report.quasarpm.com/superset/explore/?form_data=%7B%22datasource%22%3A%2262__table%22%2C%22viz_type%22%3A%22pivot_table%22%2C%22slice_id%22%3A152%2C%22granularity_sqla%22%3A%22TransmDate%22%2C%22time_grain_sqla%22%3A%22P1M%22%2C%22since%22%3A%222+years+ago%22%2C%22until%22%3A%22now%22%2C%22groupby%22%3A%5B%22Year%22%2C%22BapcoResponse%22%5D%2C%22columns%22%3A%5B%5D%2C%22metrics%22%3A%5B%22Total+CS%22%5D%2C%22row_limit%22%3A10000%2C%22pandas_aggfunc%22%3A%22sum%22%2C%22pivot_margins%22%3Atrue%2C%22number_format%22%3A%22.3s%22%2C%22combine_metric%22%3Afalse%2C%22where%22%3A%22%22%2C%22having%22%3A%22%22%2C%22filters%22%3A%5B%7B%22val%22%3A%5B1%5D%2C%22op%22%3A%22in%22%2C%22col%22%3A%22IsReply%22%7D%5D%2C%22url_params%22%3A%7B%7D%7D&standalone=true&height=400"
 >
 </iframe>
+   <br>
+    <img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64">
+    
+    <h3>{{_("Excel Reporting")}}</h3>
+    <br>
+    <br>
    
+    <form action="/report/csreplies_rep/" method="post">
+        <button class="btn btn-success" name="forwardBtn" type="submit">Download CS Replies</button>
+        
+    </form>
+    <br>
+    <br>
+    
 
   </div>
 </div>

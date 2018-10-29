@@ -7,7 +7,8 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 import uuid
 #from views import Report
 from flask import render_template, abort
-import time
+from urllib.parse import urlparse, parse_qs
+import json, requests
 
 
 rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
@@ -614,3 +615,21 @@ def check_doc_closed2():
         db.session.commit()
     db.session.close()
         #return True
+                                      
+def report_url(self):
+    url = 'https://report.quasarpm.com/superset/explore/?form_data=%7B%22datasource%22%3A%2262__table%22%2C%22viz_type%22%3A%22pivot_table%22%2C%22slice_id%22%3A152%2C%22granularity_sqla%22%3A%22TransmDate%22%2C%22time_grain_sqla%22%3A%22P1M%22%2C%22since%22%3A%221+years+ago%22%2C%22until%22%3A%22now%22%2C%22groupby%22%3A%5B%22Year%22%2C%22BapcoResponse%22%5D%2C%22columns%22%3A%5B%22IsReply%22%5D%2C%22metrics%22%3A%5B%22Total+CS%22%5D%2C%22row_limit%22%3A10000%2C%22pandas_aggfunc%22%3A%22sum%22%2C%22pivot_margins%22%3Atrue%2C%22number_format%22%3A%22.3s%22%2C%22combine_metric%22%3Afalse%2C%22where%22%3A%22%22%2C%22having%22%3A%22%22%2C%22filters%22%3A%5B%7B%22val%22%3A%5B1%5D%2C%22op%22%3A%22in%22%2C%22col%22%3A%22IsReply%22%7D%5D%2C%22url_params%22%3A%7B%7D%7D&standalone=true&height=400'
+    out = urlparse(url)
+    params = parse_qs(out.query)
+    form_data = json.loads(params['form_data'][0])
+    url_only = out._replace(query=None).geturl()
+    print('url only', url_only)   
+
+    url_new = requests.get(url_only, params=params)
+    print('urln new', url_new.url, url_new.content )  
+    print('FORM DATA ARGS:')
+    for k,v in form_data.items():
+        
+        print(k, '--> ',v)
+       
+    
+    return print(params['form_data'])
