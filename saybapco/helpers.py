@@ -14,6 +14,28 @@ import json, requests
 rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
 
+def set_position():
+    documents_list = db.session.query(models.Document).all()
+    for doc in documents_list:
+        revision = models.Revisions
+        revisions_list = db.session.query(revision).filter(revision.document_id == doc.id).order_by((revision.date_trs).asc()).all()
+        count = 0
+        #revision.p
+        for rev in revisions_list:
+            rev.pos = count
+            rev.changed_by_fk = 1
+            count += 1
+            db.session.commit()
+        
+        print(revisions_list[-1])
+        self = 'fede'
+        set_current(self, revisions_list[-1])
+
+            #print(rev, rev.date_trs)  
+
+
+
+
 def parse_escaped_character_match(match):
     return chr(int(match.group(1), 16))
 
@@ -88,7 +110,7 @@ def comments(item):
     try:
         print(UPLOAD_FOLDER)
         file = open(UPLOAD_FOLDER + item.file, mode='rb')
-        
+
         print(UPLOAD_FOLDER)
         wb = openpyxl.load_workbook(file)
         ws = wb.active
@@ -125,6 +147,7 @@ def comments(item):
         for row in ws.iter_rows(min_row=2):
             #print(row[0].value, row[1].value, row[2].value,
                 #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
+            
             if row[0].value is not None:
                 #print('row 0 in not null', row[0].value)
                 
@@ -167,9 +190,12 @@ def comments(item):
             
                 
     except:
+        print()
         abort(400,'Please check your Excel file format.')
     
     session.commit()
+    print('comments done')
+    
     #session.close()
     
     return 'done'
@@ -208,6 +234,7 @@ def set_current(self, item):
         
         print('not here')
         comments(item)
+        print('still here')
         print(doc.revision)
         for rev in doc.revision:
             print(rev)

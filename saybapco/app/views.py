@@ -5,7 +5,7 @@ from app import appbuilder, db
 from .models import Document, Comments, Revisions
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
-                    set_current, report_url
+                    set_current, report_url, set_position
                     )
 from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
@@ -476,10 +476,10 @@ class RevisionView(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    '''
-    base_filters = [['partner', FilterNotContains, "SOC"],
-                    ['partner', FilterNotContains, "MOC"]]
-    '''
+    
+    base_filters = [['trasmittal', FilterNotContains, "SOC"],
+                    ['trasmittal', FilterNotContains, "MOC"]]
+    
     list_columns = ['document.partner','document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
@@ -683,7 +683,7 @@ appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Com
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 
-
+#set_position() 
 #mass_update()  
 #set_comments_blank()
 #set_comments_included()
