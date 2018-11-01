@@ -16,25 +16,167 @@ rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S'
 
 def set_position():
     documents_list = db.session.query(models.Document).all()
+    last_revision_list = []
+    revision = models.Revisions
+    comments = models.Comments
+    session = db.session
+    
     for doc in documents_list:
-        revision = models.Revisions
         revisions_list = db.session.query(revision).filter(revision.document_id == doc.id).order_by((revision.date_trs).asc()).all()
         count = 0
         #revision.p
+        #
+        # Set the revision position by transmittal date
+        #
         for rev in revisions_list:
+            rev.changed_by_fk = '1'
+            rev.current = False
             rev.pos = count
-            rev.changed_by_fk = 1
             count += 1
-            db.session.commit()
+    
+        #session.commit()
+        #db.session.close() 
+
+    
+        #
+        # Set the last revision as current
+        # 
+        #   
         
-        print(revisions_list[-1])
-        self = 'fede'
-        set_current(self, revisions_list[-1])
+        last_rev = revisions_list[-1]
+        
+        last_rev.current = True
+        last_rev.changed_by_fk = '1'
+        
+        # 
+        # Commit to db
+        #  
 
-            #print(rev, rev.date_trs)  
+        
+        #last_revision_list.append(last_rev)
+        db.session.query(comments).filter(comments.document_id == last_rev.document_id).delete()
+        
+        db.session.commit() 
+        last_revision_list.append(last_rev)
+    
+    set_last_rev_comments(last_revision_list)
+        
+def set_last_rev_comments(last_revision_list):
+    session = db.session
+    text = models.Comments
+
+    for item in last_revision_list: 
+        filename = get_file_original_name(item.file)
+        
+        type_reply = False
+
+        if filename[-8:-5] == "REP":
+            print('Reply identification: ', filename[-8:-5] )
+            type_reply = True
+        
+        try:
+            print(UPLOAD_FOLDER)
+            file = open(UPLOAD_FOLDER + item.file, mode='rb')
+
+            print(UPLOAD_FOLDER)
+            wb = openpyxl.load_workbook(file)
+            ws = wb.active
+
+            
+            comment= models.Comments
+            documents = models.Document
+            revisions = models.Revisions
+
+            #revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
+            #revision = session.query(revisions).filter(revisions.id == item.id).first()
+            #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+        
+            #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+            #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
+            #print('the comments len is:', len(comm_list))
+            #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+            #print('delete query executed')
+            
+        except:
+            abort(400,'OPEN FILE - Please check your Excel file format.')
+        
+
+        #session.commit()
+        #check columns label
+        #for row in ws.iter_colum()
+        #print('document id', item.document_id,'revision:', item.id)
+        
+        partner = "XXX"
+        
+        print('here')
+        #revision = item.revision
+        try:
+            
+            for row in ws.iter_rows(min_row=2):
+                #print(row[0].value, row[1].value, row[2].value,
+                    #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
+                
+                if row[0].value is not None:
+                    #print('row 0 in not null', row[0].value)
+                    
 
 
+                    id_c = sanetext(row[0].value)
+                    style = sanetext(row[1].value)
+                    page = sanetext(row[2].value)
+                    author = sanetext(row[3].value)
+                    comment = sanetext(row[4].value)
+                    reply = sanetext(row[5].value)
+                    included = sanetext(row[6].value)
+                    closed = sanetext(row[7].value)
 
+
+                    #print(id_c, style, author)
+                    
+
+
+                    if closed == 'Y':
+                        closed = True
+                    else:
+                        closed = False
+                    
+                    if included == 'Y':
+                        included = True
+                        closed = True
+                    else:
+                        included = False
+                                    
+                    #print('before comment')
+                    print('document id', item.document_id,'revision:', item.id)
+                    print(item.document_id, item.id, type_reply, comment)
+                    #reply = True
+                    
+                    comm = text(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
+                                    reply=reply, included=included, closed=closed,
+                                    document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
+                    comm.changed_by_fk = '1'
+                    comm.created_by_fk = '1'
+                    print('before add')
+                    print('reply: ', reply, 'partner', partner)
+                    session.add(comm)
+            
+                    #session.commit()
+                    print('after comment')
+                
+
+                    
+            
+            print('after COMMIT')
+                
+                    
+        except:
+            print('except for some reasons')
+            abort(400,'AFTER COMMIT - Please check your Excel file format.')
+        
+        
+        session.commit()
+        print('comments done')
+     
 
 def parse_escaped_character_match(match):
     return chr(int(match.group(1), 16))
@@ -79,6 +221,31 @@ def check_duplicates():
     print('dupes', dupes)
 
 def comments(item):
+    revision = models.Revisions
+    doc = item.document
+    revisions_list = db.session.query(revision).filter(revision.document_id == doc.id).order_by((revision.date_trs).asc()).all()
+    count = 0
+    #revision.p
+    #
+    # Set the revision position by transmittal date
+    #
+    for rev in revisions_list:
+        #rev.changed_by_fk = '1'
+        rev.current = False
+        rev.pos = count
+        count += 1
+    # 
+    # Set the last revision as current
+    #
+
+    item = revisions_list[-1]
+    item.current = True
+    comments = models.Comments
+    db.session.query(comments).filter(comments.document_id == item.document_id).delete()
+
+    
+    # old comment function
+    
     try:
         print('file processed:', str(item.file))
         
@@ -122,10 +289,10 @@ def comments(item):
 
         revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
         #revision = session.query(revisions).filter(revisions.id == item.id).first()
-        session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+        #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
     
         #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
-        comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
+        #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
         #print('the comments len is:', len(comm_list))
         session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
         #print('delete query executed')
@@ -193,8 +360,10 @@ def comments(item):
         print()
         abort(400,'Please check your Excel file format.')
     
+    
     session.commit()
     print('comments done')
+    
     
     #session.close()
     
@@ -223,6 +392,7 @@ def set_current(self, item):
     print('set current function start')
     print(item.document)
     doc = item.document
+    
     try:
         print(doc.id)
         #print(doc.document_id)
@@ -241,6 +411,7 @@ def set_current(self, item):
             rev.current = False
         item.current = True
         db.session.commit()
+        #d.session.close()
     except:
         print('something wrong in set current')
         pass

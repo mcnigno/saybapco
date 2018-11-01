@@ -121,10 +121,11 @@ class Revisions(AuditMixin, Model):
     current = Column(Boolean, default=False)
     
     def __repr__(self):
+        
         if self.reply:
             return self.revision +"-Reply"  
         return self.revision
-
+    
     def file_name(self):
         return get_file_original_name(str(self.file))
 

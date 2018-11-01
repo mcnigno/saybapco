@@ -477,8 +477,8 @@ class RevisionView(ModelView):
         'trasmittal': 'Transmittal'
     }
     
-    base_filters = [['trasmittal', FilterNotContains, "SOC"],
-                    ['trasmittal', FilterNotContains, "MOC"]]
+    base_filters = [['trasmittal', FilterNotContains, "%SOC%"],
+                    ['trasmittal', FilterNotContains, "%MOC%"]]
     
     list_columns = ['document.partner','document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
@@ -683,7 +683,7 @@ appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Com
 appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 
-#set_position() 
+#set_position()   
 #mass_update()  
 #set_comments_blank()
 #set_comments_included()
