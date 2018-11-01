@@ -1,5 +1,5 @@
 import logging
-from flask import Flask
+from flask import Flask, session
 from flask_appbuilder import SQLA, AppBuilder
 from app.index import MyIndexView
 from .momentjs import momentjs
@@ -24,6 +24,9 @@ MIGRATION_DIR = 'migrations'
 migrate = Migrate(app, db, directory=MIGRATION_DIR)
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView, base_template='mybase.html')
 
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 """
 from sqlalchemy.engine import Engine

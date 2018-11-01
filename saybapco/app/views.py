@@ -16,11 +16,14 @@ from flask import request, send_file
 from config import UPLOAD_FOLDER
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
 from mass_update import test_closed, reply_rev, find_action, last_rev
-from flask import flash, abort, Response, g
+from flask import flash, abort, Response, g, url_for, session
 from flask_appbuilder.widgets import ListThumbnail, ListBlock
 
 def get_user():
     return g.user
+
+def get_last_doc():
+        return g.last_document
 
 class InvalidUsage(Exception):
     status_code = 400
@@ -282,6 +285,7 @@ class RevisionList(ModelView):
     @action("current", "Current Revision", "Set This Revision as Current?", "fa-rocket")
     def current(self, item):
         item = item[0]
+        print('file in item[0]', item.file)
         item.document_id, item.partner = check_Doc(self, item) 
         set_current(self, item)
         self.update_redirect()
@@ -524,7 +528,8 @@ class RevisionView(ModelView):
         
         item.reply = check_reply(self, item)
         item.document_id, item.partner = check_Doc(self, item)
-        
+        session['last_document'] = item.document_id
+        print('last document ----', session['last_document'])
         filename = get_file_original_name(item.file)
         result, message = precheck_doc(self,item)
         if result == False:
@@ -541,8 +546,16 @@ class RevisionView(ModelView):
 
         comments(item)
         check_doc_closed(item.document_id)
+        
 
+       
+    def post_add_redirect(self):
+        """Override this function to control the redirect after add endpoint is called."""
+        
+        doc = str(session['last_document'])
 
+        return redirect(url_for('DocumentView.show', pk=doc))
+    
 
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)

@@ -305,8 +305,8 @@ def comments(item):
     #check columns label
     #for row in ws.iter_colum()
     #print('document id', item.document_id,'revision:', item.id)
-    
-    partner = item.partner
+    print('before the partner')
+    partner = 'ND'
     print('here')
     #revision = item.revision
     try:
@@ -345,15 +345,15 @@ def comments(item):
                 else:
                     included = False
                                 
-                #print('before comment')
-                #print('document id', item.document_id,'revision:', item.id)
+                print('before comment')
+                print('document id', item.document_id,'revision:', item.id, partner)
                 comm = comments(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                 reply=reply, included=included, closed=closed,
                                 document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
                 
                 session.add(comm)
 
-                #print('after comment')
+                print('after comment')
             
                 
     except:
@@ -392,6 +392,7 @@ def set_current(self, item):
     print('set current function start')
     print(item.document)
     doc = item.document
+    print('item set file', item.file)
     
     try:
         print(doc.id)
@@ -406,12 +407,14 @@ def set_current(self, item):
         comments(item)
         print('still here')
         print(doc.revision)
+        '''
         for rev in doc.revision:
             print(rev)
             rev.current = False
         item.current = True
         db.session.commit()
         #d.session.close()
+        '''
     except:
         print('something wrong in set current')
         pass
@@ -448,13 +451,14 @@ def precheck_doc(self, item):
     except:
         return False, "Something Wrong Whit Your File Name: " + filename
 
+    '''
     try:
         if this_rev != "A":
             last_rev(self, revision)
     except:
         print('something worng with last rev function')
         pass
-
+    '''
     return True, "File uploaded " + filename
 
 def check_Doc(self, item):

@@ -163,7 +163,7 @@ class Revisions(AuditMixin, Model):
             return str(self.document) 
         return str(self.document)
     
-    def partner(self):
+    def pretty_partner(self):
         doc = self.document
         my_partner = doc.partner
         return my_partner     
