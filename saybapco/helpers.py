@@ -15,7 +15,7 @@ rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S'
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
 
 def set_position():
-    documents_list = db.session.query(models.Document).all()[:2] 
+    documents_list = db.session.query(models.Document).all() 
     last_revision_list = []
     revision = models.Revisions
     comments = models.Comments
@@ -77,14 +77,14 @@ def set_last_rev_comments(last_revision_list):
         type_reply = False
 
         if filename[-8:-5] == "REP":
-            print('Reply identification: ', filename[-8:-5] )
+            #print('Reply identification: ', filename[-8:-5] )
             type_reply = True
         
         try:
-            print(UPLOAD_FOLDER)
+            #print(UPLOAD_FOLDER)
             file = open(UPLOAD_FOLDER + item.file, mode='rb')
 
-            print(UPLOAD_FOLDER)
+            #print(UPLOAD_FOLDER)
             wb = openpyxl.load_workbook(file)
             ws = wb.active
 
@@ -153,8 +153,8 @@ def set_last_rev_comments(last_revision_list):
                         included = False
                                     
                     #print('before comment')
-                    print('document id', item.document_id,'revision:', item.id)
-                    print(item.document_id, item.id, type_reply, comment)
+                    #print('document id', item.document_id,'revision:', item.id)
+                    #print(item.document_id, item.id, type_reply, comment)
                     #reply = True
                     
                     comm = text(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
@@ -163,7 +163,7 @@ def set_last_rev_comments(last_revision_list):
                     comm.changed_by_fk = '1'
                     comm.created_by_fk = '1'
                     #print('before add')
-                    print('reply: ', reply, 'partner', partner)
+                    #print('reply: ', reply, 'partner', partner)
                     session.add(comm)
             
                     #session.commit()
@@ -172,7 +172,7 @@ def set_last_rev_comments(last_revision_list):
 
                     
             
-            print('CS COMMIT')
+            #print('CS COMMIT')
                 
                     
         except:
