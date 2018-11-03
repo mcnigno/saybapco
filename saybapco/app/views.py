@@ -1,13 +1,17 @@
 from flask import render_template, redirect
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask_appbuilder import ModelView, IndexView, BaseView, expose, MasterDetailView, DirectByChartView, GroupByChartView
+from flask_appbuilder import (ModelView, IndexView, BaseView, expose, MasterDetailView, 
+                              DirectByChartView, GroupByChartView, CompactCRUDMixin, MultipleView)
 from app import appbuilder, db
 from .models import Document, Comments, Revisions
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
                     set_current, report_url, set_position
                     )
-from flask_appbuilder.widgets import ListBlock, ListCarousel, ListMasterWidget, ListThumbnail
+from flask_appbuilder.widgets import (ListBlock, ListCarousel, ListMasterWidget, 
+                                        ListThumbnail, SearchWidget, ShowBlockWidget,
+                                        ShowVerticalWidget)
+
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access
 from flask_appbuilder.filemanager import get_file_original_name
@@ -18,6 +22,7 @@ from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFu
 from mass_update import test_closed, reply_rev, find_action, last_rev
 from flask import flash, abort, Response, g, url_for, session
 from flask_appbuilder.widgets import ListThumbnail, ListBlock
+from .customwidgets import ShowDocument
 
 def get_user():
     return g.user
@@ -92,6 +97,30 @@ class CsRepliesView(BaseView):
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
 
+class CsDashboardView(BaseView):
+    default_view = 'csdashboard'
+    @expose('/csdashboard', methods=['POST', 'GET'])
+    def csdashboard(self):
+        print('csdashboard') 
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('csdashboard.html')
+    
+    @expose('/csdashboard_rep/', methods=['POST', 'GET'])
+    def csdashboard_rep(self):
+        print('csdashboard_rep')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('csdashboard_rep')
+            print('csdashboard_rep')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
+
+
 class CsMonthView(BaseView):
     default_view = 'csmonthly'
     @expose('/csmonthly', methods=['POST', 'GET'])
@@ -115,6 +144,63 @@ class CsMonthView(BaseView):
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
 
+class CurrentCommentView(ModelView):
+    datamodel = SQLAInterface(Comments)
+    search_columns = ['included','closed', 'document','revision']
+    base_order = ('id_c','asc')
+    order_columns = ['id_c']
+    label_columns = {
+        'pretty_style' : 'Type',
+        'pretty_included': 'Included',
+        'pretty_closed': 'Closed',
+        'document': 'Bapco Code',
+        'pretty_comment': 'Comments',
+        'pretty_reply': 'Replies',
+        'pretty_revision': 'Rev',
+    }
+    #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    list_columns = ['pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    base_filters = [['revision.current', FilterEqual, 1]]
+
+    #base_permissions = ['can_list', 'can_edit']
+    #list_widget = ListThumbnail
+     
+    add_exclude_columns = ['created_on', 'changed_on']
+    edit_exclude_columns = ['created_on', 'changed_on']
+    show_exclude_columns = ['comments']
+    
+    
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+    
+    @has_access
+    @action("include", "Include & Close All", "Iclude and Close all Comments, Really?", "fa-rocket")
+    def include(self, items):
+        if isinstance(items, list):
+            for item in items:
+                item.closed = True
+                item.included = True
+                self.datamodel.edit(item)
+            self.update_redirect()
+        else:
+            item = items
+            item.closed = True
+            item.included = True
+            self.datamodel.edit(item)
+            check_doc_closed(item.document_id)
+            self.update_redirect()
+        return redirect(self.get_redirect())
+    
+    #def post_update(self, item):
+        #check_doc_closed(item.document_id)
+    
+
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comments)
     search_columns = ['included','closed', 'document','revision']
@@ -131,12 +217,15 @@ class CommentView(ModelView):
     }
     #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
     list_columns = ['pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
-    
+    #base_filters = [['revision.current', FilterEqual, 1]]
+
+    #base_permissions = ['can_list', 'can_edit']
     #list_widget = ListThumbnail
-    
+     
     add_exclude_columns = ['created_on', 'changed_on']
-    edit_exclude_columns = ['created_on', 'changed_on']
-    show_exclude_columns = ['comments']
+    edit_exclude_columns = ['created_on', 'changed_on','created_by', 'changed_by', 'partner','document','id_c','style','note','type_reply']
+    show_exclude_columns = ['comments','partner']
+    
 
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -163,7 +252,7 @@ class CommentView(ModelView):
         return redirect(self.get_redirect())
     def post_update(self, item):
         check_doc_closed(item.document_id)
-
+    
 '''
 class OpenCommentsView(ModelView):
     datamodel = SQLAInterface(Comments)
@@ -173,19 +262,38 @@ class OpenCommentsView(ModelView):
     
     ]
 '''
+class RevisionChart(GroupByChartView):
+    datamodel = SQLAInterface(Comments)
+    #chart_type = 'PieChart'
+    #height = 500
+    chart_title = 'Revisiom Comments By Status'
+    #search_columns = ['type_reply', 'included', 'closed','style']
+    #base_filters = [['type_reply', FilterEqual, True],['closed', FilterEqual, False]]
+    definitions = [
+        
+        
+        {
+            'label': 'Document',
+            'group': 'doc',
+            'series': [
+                (aggregate_count, 'comment'),
+                
+                (aggregate_sum, 'included'),
+                (aggregate_sum, 'closed'),
+                #(aggregate_count, 'open_comments')             
+            ]
+        }
+        ]
 
 class CommentsChart(GroupByChartView):
     datamodel = SQLAInterface(Comments)
     chart_type = 'BarChart'
-    height = '2000px'
+    #height = '2000px'
     chart_title = 'Open CS Chart'
     search_columns = ['type_reply', 'included', 'closed','style']
-    base_filters = [['type_reply', FilterEqual, True],
-                    ['closed', FilterEqual, False]
-    
-    ]
+    #base_filters = [['type_reply', FilterEqual, True],['closed', FilterEqual, False]]
     definitions = [
-       
+        
         {
             'label': 'Author',
             'group': 'author',
@@ -195,14 +303,15 @@ class CommentsChart(GroupByChartView):
                 #(aggregate_sum, 'included')             
             ]
         },
+        
         {
             'label': 'Document',
             'group': 'doc',
             'series': [
-                #(aggregate_count, 'comment'),
-                #(aggregate_sum, 'closed'),
+                (aggregate_count, 'comment'),
+                (aggregate_sum, 'closed'),
                 #(aggregate_sum, 'included'),
-                (aggregate_count, 'open_comments')             
+                #(aggregate_count, 'open_comments')             
             ]
         }
         ]
@@ -224,8 +333,35 @@ class CommentsPieChart(GroupByChartView):
         }
         ]
 
+class DocRevisionList(ModelView):
+    datamodel = SQLAInterface(Revisions)
+    related_views = [CommentView]
+    
+    show_template = 'appbuilder/general/model/show_cascade.html'
+    list_title = 'All CS Revisions'
+    base_permissions = ['can_list','can_show','can_edit']
+    order_columns = ['pos']
+    list_columns = ['pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    #list_widget = ListBlock
+    edit_columns = ['revision', 'trasmittal', 'date_trs','note']
+    show_columns = ['pretty_doc_revision','file', 'revision', 'trasmittal', 'date_trs','note','action_code']
+    label_columns = {
+        
+        'action_code': 'Response Code',
+        
+        'pretty_revision': 'Rev.',
+        'pretty_doc_revision': 'Document',
+        'pretty_date': 'Date',
+        'pretty_date_trs': 'Trans. Date',
+        'download': 'File',
+        'trasmittal': 'Transmittal'
+    }
+
 class RevisionList(ModelView):
     datamodel = SQLAInterface(Revisions)
+    base_permissions = ['can_this_form_post','can_list', 'can_show']
+
+
     search_columns = ['document','revision','reply', 'trasmittal','date_trs']
     label_columns = {
         'document': 'Bapco Code',
@@ -397,7 +533,7 @@ class MyRevisionsList(ModelView):
         'download': 'File',
         'trasmittal': 'Transmittal'
     }
-    list_columns = ['pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note','changed_on', 'download']
+    list_columns = ['document.code','pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note','changed_on', 'download']
     base_filters = [['created_by', FilterEqualFunction, get_user]]
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
@@ -484,7 +620,7 @@ class RevisionView(ModelView):
     base_filters = [['trasmittal', FilterNotContains, "%SOC%"],
                     ['trasmittal', FilterNotContains, "%MOC%"]]
     
-    list_columns = ['document.partner','document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
+    list_columns = ['document.code', 'pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_columns = ['document','pretty_revision','download']
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
@@ -555,12 +691,51 @@ class RevisionView(ModelView):
         doc = str(session['last_document'])
 
         return redirect(url_for('DocumentView.show', pk=doc))
+
+class UploadCommentsView(ModelView):
+    datamodel = SQLAInterface(Revisions)
+    default_view = 'add'
+    base_permissions = ['can_add',]
+    add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     
+    def pre_add(self,item):
+
+        item.reply = check_reply(self, item)
+        item.document_id, item.partner = check_Doc(self, item)
+        
+        session['last_document'] = item.document_id
+        
+        filename = get_file_original_name(item.file)
+        result, message = precheck_doc(self,item)
+        
+        if result == False:
+            
+            return abort(400, message)
+        
+
+    def post_add(self, item):
+
+        comments(item)
+        check_doc_closed(item.document_id)
+        
+
+       
+    def post_add_redirect(self):
+        """Override this function to control the redirect after add endpoint is called."""
+        
+        doc = str(session['last_document'])
+
+        return redirect(url_for('DocumentView.show', pk=doc))
+
 
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
-    related_views = [CommentView, RevisionList]
+    related_views = [CurrentCommentView, DocRevisionList] 
+    
+    #list_template = 'appbuilder/general/model/multiple_views.html'
     show_template = 'appbuilder/general/model/show_cascade.html'
+    show_widget = ShowDocument
+    
 
     add_exclude_columns = ['created_on', 'changed_on','comments']
     edit_exclude_columns = ['created_on', 'changed_on','comments']
@@ -570,9 +745,9 @@ class DocumentView(ModelView):
 
     base_filters = [['partner', FilterNotContains, "SOC"],
                     ['partner', FilterNotContains, "MOC"]]
-
+    base_permissions = ['can_this_form_post','can_list', 'can_show']
     label_columns = {
-        'code': 'Bapco Code',
+        'code': 'Document',
         'count': 'Tot',
         'count_included': 'Included',
         'count_closed': 'Closed',
@@ -583,15 +758,12 @@ class DocumentView(ModelView):
     show_fieldsets = [
                         (
                             'Document Info',
-                            {'fields': ['code', 'revision', 'partner']}
-                        ),
-                        (
-                            'Document Audit',
-                            {'fields': ['created_on',
-                                        'created_by',
+                            {'fields': ['code', 'revision',
+    
                                         'changed_on',
-                                        'changed_by'], 'expanded':False}
+                                        'changed_by']}
                         ),
+                     
                      ]
 
     
@@ -603,6 +775,20 @@ class DocumentView(ModelView):
         else:
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
+
+class DocumentListView(ModelView):
+    datamodel = SQLAInterface(Document)
+    search_widget = [SearchWidget]
+    search_columns = ['code','unit','materialclass','doctype']
+    #search_exclude_columns = ['created_by']
+    #list_widget = ListBlock
+    
+    list_columns = ['code','unit','materialclass','doctype']
+
+class DocumentMonitorView(MultipleView, ModelView):
+    datamodel = SQLAInterface(Document)
+    views = [CommentsChart, DocumentView, RevisionChart]
+    
 
 class SuperDocumentView(ModelView):
     datamodel = SQLAInterface(Document)
@@ -664,6 +850,11 @@ class SuperDocumentView(ModelView):
         last_rev(self, item)
         return redirect(self.get_redirect())
     '''
+
+
+
+
+
 """
     Application wide 404 error handler
 """
@@ -680,21 +871,33 @@ from mass_update import mass_update
 #appbuilder.security_cleanup()
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
-appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
-appbuilder.add_view(CsRepliesView,'CS Replies Status',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
-appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Report List", category_icon='fas fa-chart-bar')
+#appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
+#appbuilder.add_view(CsRepliesView,'CS Replies Status',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
+#appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsDashboardView,'General CS Dasboard',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
-appbuilder.add_view(RevisionView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(RevisionFileChange,'Revision File Change',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(UploadCommentsView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_separator(category='Comments')
+appbuilder.add_view(MyRevisionsList,'My CS File List',icon="fas fa-sort-amount-up", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_view(RevisionFileChange,'Revision File Change',icon="fas fa-exchange-alt", category="Comments", category_icon='fas fa-comment')
+appbuilder.add_separator(category='Comments')
+appbuilder.add_view(RevisionView,'All CS File List',icon="fas fa-list-ul", category="Comments", category_icon='fas fa-comment')
 
-appbuilder.add_view(MyRevisionsList,'My Revisions List',icon="fas fa-sort-amount-up", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(DocumentView,'Document',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(SuperDocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
+#appbuilder.add_view(DocumentMonitorView,'Document Monitor',icon="fas fa-file-pdf", category="Comments", category_icon='fas fa-comment')
 
-appbuilder.add_view_no_menu(RevisionList) 
-appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
-appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
-appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
+#appbuilder.add_view(SuperDocumentView,'SuperDocument',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file')
+
+appbuilder.add_view_no_menu(RevisionList)
+appbuilder.add_view_no_menu(DocRevisionList) 
+appbuilder.add_view_no_menu(DocumentListView) 
+appbuilder.add_view_no_menu(RevisionChart) 
+appbuilder.add_view_no_menu(CommentView) 
+appbuilder.add_view_no_menu(CurrentCommentView)
+#appbuilder.add_view(CommentView,'Comments',icon="fas fa-comments", category="Comments", category_icon='fas fa-comment')
+
+#appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
+#appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 
 #set_position()   
 #mass_update()  

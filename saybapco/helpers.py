@@ -235,13 +235,14 @@ def comments(item):
         rev.pos = count
         count += 1
     # 
-    # Set the last revision as current
+    # Set the last revision by trans. date as current
     #
 
-    item = revisions_list[-1]
-    item.current = True
+    this_last_rev = revisions_list[-1]
+    this_last_rev.current = True
+
     comments = models.Comments
-    db.session.query(comments).filter(comments.document_id == item.document_id).delete()
+    #db.session.query(comments).filter(comments.document_id == item.document_id).delete()
 
     
     # old comment function
@@ -284,17 +285,17 @@ def comments(item):
 
         session = db.session
         comments= models.Comments
-        documents = models.Document
-        revisions = models.Revisions
+        #documents = models.Document
+        #revisions = models.Revisions
 
-        revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
+        #revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
         #revision = session.query(revisions).filter(revisions.id == item.id).first()
         #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
     
         #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
         #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
         #print('the comments len is:', len(comm_list))
-        session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+        #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
         #print('delete query executed')
         
     except:
