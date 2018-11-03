@@ -70,119 +70,126 @@ def set_position():
 def set_last_rev_comments(last_revision_list):
     session = db.session
     text = models.Comments
+    error_list = []
 
-    for item in last_revision_list: 
-        filename = get_file_original_name(item.file)
-        
-        type_reply = False
-
-        if filename[-8:-5] == "REP":
-            #print('Reply identification: ', filename[-8:-5] )
-            type_reply = True
-        
-        try:
-            #print(UPLOAD_FOLDER)
-            file = open(UPLOAD_FOLDER + item.file, mode='rb')
-
-            #print(UPLOAD_FOLDER)
-            wb = openpyxl.load_workbook(file)
-            ws = wb.active
-
+    for item in last_revision_list:
+        try: 
+            filename = get_file_original_name(item.file)
             
-            comment= models.Comments
-            documents = models.Document
-            revisions = models.Revisions
+            type_reply = False
 
-            #revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
-            #revision = session.query(revisions).filter(revisions.id == item.id).first()
-            #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-        
-            #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
-            #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
-            #print('the comments len is:', len(comm_list))
-            #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-            #print('delete query executed')
+            if filename[-8:-5] == "REP":
+                #print('Reply identification: ', filename[-8:-5] )
+                type_reply = True
             
+            try:
+                #print(UPLOAD_FOLDER)
+                file = open(UPLOAD_FOLDER + item.file, mode='rb')
+
+                #print(UPLOAD_FOLDER)
+                wb = openpyxl.load_workbook(file)
+                ws = wb.active
+
+                
+                comment= models.Comments
+                documents = models.Document
+                revisions = models.Revisions
+
+                #revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
+                #revision = session.query(revisions).filter(revisions.id == item.id).first()
+                #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+            
+                #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
+                #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
+                #print('the comments len is:', len(comm_list))
+                #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
+                #print('delete query executed')
+                
+            except:
+                abort(400,'OPEN FILE - Please check your Excel file format.')
+            
+
+            #session.commit()
+            #check columns label
+            #for row in ws.iter_colum()
+            #print('document id', item.document_id,'revision:', item.id)
+            
+            partner = "XXX"
+            
+            print('CS File', filename)
+            #revision = item.revision
+            try:
+                
+                for row in ws.iter_rows(min_row=2):
+                    #print(row[0].value, row[1].value, row[2].value,
+                        #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
+                    
+                    if row[0].value is not None and row[4].value is not None:
+                        #print('row 0 in not null', row[0].value)
+                        
+
+
+                        id_c = sanetext(row[0].value)
+                        style = sanetext(row[1].value)
+                        page = sanetext(row[2].value)
+                        author = sanetext(row[3].value)
+                        comment = sanetext(row[4].value)
+                        reply = sanetext(row[5].value)
+                        included = sanetext(row[6].value)
+                        closed = sanetext(row[7].value)
+
+
+                        #print(id_c, style, author)
+                        
+
+
+                        if closed == 'Y':
+                            closed = True
+                        else:
+                            closed = False
+                        
+                        if included == 'Y':
+                            included = True
+                            closed = True
+                        else:
+                            included = False
+                                        
+                        #print('before comment')
+                        #print('document id', item.document_id,'revision:', item.id)
+                        #print(item.document_id, item.id, type_reply, comment)
+                        #reply = True
+                        
+                        comm = text(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
+                                        reply=reply, included=included, closed=closed,
+                                        document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
+                        comm.changed_by_fk = '1'
+                        comm.created_by_fk = '1'
+                        #print('before add')
+                        #print('reply: ', reply, 'partner', partner)
+                        session.add(comm)
+                
+                        #session.commit()
+                        #print('after comment')
+                    
+
+                        
+                
+                #print('CS COMMIT')
+                    
+                        
+            except:
+                print('except for some reasons')
+                abort(400,'AFTER COMMIT - Please check your Excel file format.')
+            
+            
+            session.commit()
+            print('CS Commit DONE')
+        
         except:
-            abort(400,'OPEN FILE - Please check your Excel file format.')
-        
-
-        #session.commit()
-        #check columns label
-        #for row in ws.iter_colum()
-        #print('document id', item.document_id,'revision:', item.id)
-        
-        partner = "XXX"
-        
-        print('CS File', filename)
-        #revision = item.revision
-        try:
-            
-            for row in ws.iter_rows(min_row=2):
-                #print(row[0].value, row[1].value, row[2].value,
-                    #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
-                
-                if row[0].value is not None and row[4].value is not None:
-                    #print('row 0 in not null', row[0].value)
-                    
-
-
-                    id_c = sanetext(row[0].value)
-                    style = sanetext(row[1].value)
-                    page = sanetext(row[2].value)
-                    author = sanetext(row[3].value)
-                    comment = sanetext(row[4].value)
-                    reply = sanetext(row[5].value)
-                    included = sanetext(row[6].value)
-                    closed = sanetext(row[7].value)
-
-
-                    #print(id_c, style, author)
-                    
-
-
-                    if closed == 'Y':
-                        closed = True
-                    else:
-                        closed = False
-                    
-                    if included == 'Y':
-                        included = True
-                        closed = True
-                    else:
-                        included = False
-                                    
-                    #print('before comment')
-                    #print('document id', item.document_id,'revision:', item.id)
-                    #print(item.document_id, item.id, type_reply, comment)
-                    #reply = True
-                    
-                    comm = text(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
-                                    reply=reply, included=included, closed=closed,
-                                    document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
-                    comm.changed_by_fk = '1'
-                    comm.created_by_fk = '1'
-                    #print('before add')
-                    #print('reply: ', reply, 'partner', partner)
-                    session.add(comm)
-            
-                    #session.commit()
-                    #print('after comment')
-                
-
-                    
-            
-            #print('CS COMMIT')
-                
-                    
-        except:
-            print('except for some reasons')
-            abort(400,'AFTER COMMIT - Please check your Excel file format.')
-        
-        
-        session.commit()
-        print('CS Commit DONE')
-     
+            error_list.append(item)
+            pass
+    print('ERROR LIST')
+    print(error_list)
 
 def parse_escaped_character_match(match):
     return chr(int(match.group(1), 16))
