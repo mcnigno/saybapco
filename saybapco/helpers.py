@@ -15,8 +15,9 @@ rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S'
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
 
 def set_position():
-    documents_list = db.session.query(models.Document).all() 
-    last_revision_list = []
+    last_revision_list = db.session.query(models.Revisions).filter(models.Revisions.current == 1).all() 
+     
+    '''
     revision = models.Revisions
     comments = models.Comments
     session = db.session
@@ -64,13 +65,15 @@ def set_position():
         
         db.session.commit() 
         last_revision_list.append(last_rev)
-    
+    '''
+    print('the len of current revision list is,', len(last_revision_list))
     set_last_rev_comments(last_revision_list)
         
 def set_last_rev_comments(last_revision_list):
     session = db.session
     text = models.Comments
     error_list = []
+    count = 0
 
     for item in last_revision_list:
         try: 
@@ -159,6 +162,9 @@ def set_last_rev_comments(last_revision_list):
                         #print(item.document_id, item.id, type_reply, comment)
                         #reply = True
                         
+                        if not isinstance(id_c,int) and len(id_c) <= 5:
+                            id_c = 1
+
                         comm = text(id_c=id_c, partner=partner, style=style, page=page, author=author, comment=comment,
                                         reply=reply, included=included, closed=closed,
                                         document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
@@ -186,6 +192,7 @@ def set_last_rev_comments(last_revision_list):
             print('CS Commit DONE')
         
         except:
+            session.rollback()
             error_list.append(item)
             pass
     print('ERROR LIST')
