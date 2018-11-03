@@ -15,7 +15,7 @@ rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S'
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
 
 def set_position():
-    documents_list = db.session.query(models.Document).all()
+    documents_list = db.session.query(models.Document).all()[:2] 
     last_revision_list = []
     revision = models.Revisions
     comments = models.Comments
@@ -42,8 +42,11 @@ def set_position():
         # Set the last revision as current
         # 
         #   
+        try:
+            last_rev = revisions_list[-1]
+        except:
+            print('last rev index problem on', doc)
         
-        last_rev = revisions_list[-1]
         
         last_rev.current = True
         last_rev.changed_by_fk = '1'
