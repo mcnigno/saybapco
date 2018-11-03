@@ -119,7 +119,7 @@ def set_last_rev_comments(last_revision_list):
                 #print(row[0].value, row[1].value, row[2].value,
                     #row[3].value, row[4].value, row[5].value, row[6].value, row[7].value)
                 
-                if row[0].value is not None:
+                if row[0].value is not None and row[4] is not None:
                     #print('row 0 in not null', row[0].value)
                     
 
