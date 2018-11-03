@@ -108,7 +108,7 @@ def set_last_rev_comments(last_revision_list):
         
         partner = "XXX"
         
-        print('here')
+        print('CS File', filename)
         #revision = item.revision
         try:
             
@@ -156,17 +156,17 @@ def set_last_rev_comments(last_revision_list):
                                     document_id=item.document_id, revision_id=item.id, type_reply=type_reply)
                     comm.changed_by_fk = '1'
                     comm.created_by_fk = '1'
-                    print('before add')
+                    #print('before add')
                     print('reply: ', reply, 'partner', partner)
                     session.add(comm)
             
                     #session.commit()
-                    print('after comment')
+                    #print('after comment')
                 
 
                     
             
-            print('after COMMIT')
+            print('CS COMMIT')
                 
                     
         except:
@@ -175,7 +175,7 @@ def set_last_rev_comments(last_revision_list):
         
         
         session.commit()
-        print('comments done')
+        print('CS Commit DONE')
      
 
 def parse_escaped_character_match(match):

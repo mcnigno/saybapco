@@ -899,7 +899,8 @@ appbuilder.add_view_no_menu(CurrentCommentView)
 #appbuilder.add_view(CommentsChart,'Comment Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 #appbuilder.add_view(CommentsPieChart,'Comment Pie Chart',icon="fas fa-code-branch", category="Statistics", category_icon='fas fa-comment')
 
-#set_position()   
+#
+set_position()   
 #mass_update()  
 #set_comments_blank()
 #set_comments_included()
