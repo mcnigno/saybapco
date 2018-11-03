@@ -43,7 +43,10 @@ def set_position():
         # 
         #   
         try:
-            last_rev = revisions_list[-1]
+            if isinstance(revisions_list, list):
+                last_rev = revisions_list[-1]
+            else:
+                last_rev = revisions_list
         except:
             print('last rev index problem on', doc)
         
