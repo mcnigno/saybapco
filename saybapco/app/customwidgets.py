@@ -4,4 +4,4 @@ class ShowDocument(ShowWidget):
     template = 'appbuilder/customwidgets/showdocument.html'
                          
 
-                                                         
+                                                            

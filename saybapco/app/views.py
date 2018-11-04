@@ -120,6 +120,28 @@ class CsDashboardView(BaseView):
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
 
+class CsTimeDashView(BaseView):
+    default_view = 'cstimedash'
+    @expose('/cstimedash', methods=['POST', 'GET'])
+    def cstimedash(self):
+        print('cstimedash') 
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('cstimedash.html')
+    
+    @expose('/cstimedash_rep/', methods=['POST', 'GET'])
+    def cstimedash_rep(self):
+        print('cstimedash_rep')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('cstimedash_rep')
+            print('cstimedash_rep')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
 
 class CsMonthView(BaseView):
     default_view = 'csmonthly'
@@ -874,7 +896,9 @@ from mass_update import mass_update
 #appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
 #appbuilder.add_view(CsRepliesView,'CS Replies Status',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
 #appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
-appbuilder.add_view(CsDashboardView,'General CS Dasboard',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsDashboardView,'CS General Dasboard',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsTimeDashView,'CS Time Dasboard',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+
 appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
 appbuilder.add_view(UploadCommentsView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
