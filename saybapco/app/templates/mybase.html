@@ -15,6 +15,24 @@
 
     {% endblock %}
 
+    {% block body %}
+    
+    {{ super() }}
+    
+    {% endblock %}
+    {% block navbar %}
+         
+            {{ super() }}
+            
+        {% endblock %}
+
+        {% block content %}
+         
+            {{ super() }}
+    
+        {% endblock %}
+    
+
 {% block footer %}
     {{ super() }}
     
