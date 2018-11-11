@@ -6,7 +6,7 @@ from openpyxl.styles import Font, Color
 from openpyxl.worksheet.table import Table, TableStyleInfo
 import uuid
 #from views import Report
-from flask import render_template, abort
+from flask import render_template, abort, flash
 from urllib.parse import urlparse, parse_qs
 import json, requests
 
@@ -307,31 +307,15 @@ def comments(item):
 
         session = db.session
         comments= models.Comments
-        #documents = models.Document
-        #revisions = models.Revisions
-
-        #revision = session.query(revisions).filter(revisions.revision == item.revision, revisions.document_id == item.document_id).first()
-        #revision = session.query(revisions).filter(revisions.id == item.id).first()
-        #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-    
-        #print('doc id',item.document_id,'rev id', revision.id, 'item id', item.id)
-        #comm_list = session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).all()
-        #print('the comments len is:', len(comm_list))
-        #session.query(comments).filter(comments.document_id == item.document_id, comments.revision_id == revision.id).delete()
-        #print('delete query executed')
+        
         
     except:
         abort(400,'Please check your Excel file format.')
     
 
-    #session.commit()
-    #check columns label
-    #for row in ws.iter_colum()
-    #print('document id', item.document_id,'revision:', item.id)
-    print('before the partner')
+    
     partner = 'ND'
-    print('here')
-    #revision = item.revision
+   
     try:
         
         for row in ws.iter_rows(min_row=2):
@@ -430,17 +414,110 @@ def set_current(self, item):
         comments(item)
         print('still here')
         print(doc.revision)
-        '''
+        
         for rev in doc.revision:
             print(rev)
             rev.current = False
         item.current = True
         db.session.commit()
         #d.session.close()
-        '''
+        
     except:
-        print('something wrong in set current')
-        pass
+        flash('something went wrong setting this revision as current. ', category='danger')
+        
+
+def action_include_close(item):
+    
+    rev = item.revision
+    
+    try:
+     
+        filepath = UPLOAD_FOLDER + rev.file
+
+        wb = openpyxl.load_workbook(filepath, read_only=False)
+        ws = wb.active
+        
+    except:
+        flash('OPEN FILE - Please check your Excel file.', category='danger')
+    
+    try:
+        
+        for row in ws.iter_rows(min_row=2):
+            
+            if row[0].value == item.id_c:
+                
+                try:
+                    if item.included == True:
+                        
+                        row[6].value = "Y"
+                        
+                    else:
+                        row[6].value = "N"
+                    
+                    if item.closed == True:
+                        
+                        row[7].value = "Y"
+                    else:
+                        row[7].value = "N"
+                
+                    
+                except:
+                    flash('Error in setting excel value', category='danger')
+        try:
+            wb.save(filepath)
+            
+        except:
+            flash('File can not be saved.', category='danger')
+    except:
+        flash('COMMENT Error - Please check your Excel file, no comment ID match.',category='danger')
+       
+
+def action_close(item):
+    
+    rev = item.revision
+    
+    try:
+     
+        filepath = UPLOAD_FOLDER + rev.file
+
+        wb = openpyxl.load_workbook(filepath, read_only=False)
+        ws = wb.active
+        
+    except:
+        flash('OPEN FILE - Please check your Excel file.', category='danger')
+    
+    try:
+        
+        for row in ws.iter_rows(min_row=2):
+            
+            if row[0].value == item.id_c:
+                
+                try:
+                    if item.included == True:
+                        
+                        row[6].value = "Y"
+                        
+                    else:
+                        row[6].value = "N"
+                    
+                    if item.closed == True:
+                        
+                        row[7].value = "Y"
+                    else:
+                        row[7].value = "N"
+                
+                    
+                except:
+                    flash('Error in setting excel value', category='danger')
+        try:
+            wb.save(filepath)
+            
+        except:
+            flash('File can not be saved.', category='danger')
+    except:
+        flash('COMMENT Error - Please check your Excel file, no comment ID match.',category='danger')
+
+
 
 def precheck_doc(self, item):
     filename = get_file_original_name(item.file)

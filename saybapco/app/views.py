@@ -6,14 +6,14 @@ from app import appbuilder, db
 from .models import Document, Comments, Revisions
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
-                    set_current, report_url, set_position
+                    set_current, report_url, set_position, action_include_close, action_close
                     )
 from flask_appbuilder.widgets import (ListBlock, ListCarousel, ListMasterWidget, 
                                         ListThumbnail, SearchWidget, ShowBlockWidget,
                                         ShowVerticalWidget)
 
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
-from flask_appbuilder import action, has_access
+from flask_appbuilder import action, has_access, permission_name
 from flask_appbuilder.filemanager import get_file_original_name
 from mass_update import transmittall
 from flask import request, send_file
@@ -181,7 +181,7 @@ class CurrentCommentView(ModelView):
         'pretty_revision': 'Rev',
     }
     #list_columns = ['document','id_c','pretty_partner','pretty_revision','page', 'author','pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
-    list_columns = ['pretty_style', 'pretty_comment', 'pretty_reply', 'pretty_included','pretty_closed']
+    list_columns = ['pretty_style', 'comment', 'pretty_reply', 'pretty_included','pretty_closed']
     base_filters = [['revision.current', FilterEqual, 1]]
 
     #base_permissions = ['can_list', 'can_edit']
@@ -202,23 +202,61 @@ class CurrentCommentView(ModelView):
         return redirect(self.get_redirect())
     
     @has_access
-    @action("include", "Include & Close All", "Iclude and Close all Comments, Really?", "fa-rocket")
+    @permission_name('documentview')
+    @action("include", "Include AND Close All", "Iclude and Close all Comments, Really?", "fa-rocket")
     def include(self, items):
         if isinstance(items, list):
             for item in items:
+
                 item.closed = True
                 item.included = True
+
+                check_doc_closed(item.document_id)
+                action_include_close(item)
+
+                self.datamodel.edit(item)
+
+            self.update_redirect()
+
+        else:
+            # do not seem to ever came here....
+            item = items
+            
+            item.closed = True
+            item.included = True
+
+            action_include_close(item)
+            check_doc_closed(item.document_id) 
+
+            self.datamodel.edit(item)
+            self.update_redirect()
+
+        return redirect(self.get_redirect())
+    
+    @has_access
+    @permission_name('documentview')
+    @action("close", "Close All", "Close all Comments, Really?", "fa-rocket")
+    def close(self, items):
+        if isinstance(items, list):
+            for item in items:
+                item.closed = True
+                
+                check_doc_closed(item.document_id) # for every items?
+                action_close(item)
                 self.datamodel.edit(item)
             self.update_redirect()
         else:
+            # do not seem to ever came here....
             item = items
+            
             item.closed = True
-            item.included = True
+            
             self.datamodel.edit(item)
             check_doc_closed(item.document_id)
             self.update_redirect()
         return redirect(self.get_redirect())
-    
+
+
     #def post_update(self, item):
         #check_doc_closed(item.document_id)
     
@@ -379,6 +417,19 @@ class DocRevisionList(ModelView):
         'trasmittal': 'Transmittal'
     }
 
+    #@has_access
+    #@permission_name('revisionview')
+    @action("current", "Current Revision", "Set This Revision as Current?", "fa-rocket")
+    def current(self, item):
+        item = item[0]
+        print('file in item[0]', item.file)
+        item.document_id, item.partner = check_Doc(self, item) 
+        set_current(self, item)
+        self.update_redirect()
+        return redirect(self.get_redirect())
+    
+    
+     
 class RevisionList(ModelView):
     datamodel = SQLAInterface(Revisions)
     base_permissions = ['can_this_form_post','can_list', 'can_show']

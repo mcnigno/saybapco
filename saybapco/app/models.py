@@ -18,8 +18,8 @@ AuditMixin will add automatic timestamp of created and modified by who
 def style_it(item):
     style = {
                 'Text Box': '<span style="color:#97ad66; font-size:larg; margin-left:7px;"><i class="far fa-comment-alt"></i></span>',
-                'Call-out': '<span style="color:#ad669d; font-size:larg; margin-left:7px;"><i class="fas fa-bullhorn"></i></span>',
-                'Callout': '<span style="color:#ad669d; font-size:larg; margin-left:7px;"><i class="fas fa-bullhorn"></i></span>',
+                'Call-out': '<span style="color:#66ad9a; font-size:larg; margin-left:7px;"><i class="fas fa-exclamation-triangle"></i></span>',
+                'Callout': '<span style="color:#66ad9a; font-size:larg; margin-left:7px;"><i class="fas fa-exclamation-triangle"></i></span>',
                 'Cloud+': '<span style="color:#3ec3cc; font-size:larg; margin-left:7px;"><i class="fas fa-cloud"></i></span>',
             }
     try:
@@ -105,6 +105,10 @@ class Document(AuditMixin, Model):
         if self.closed:
             return "YES"
         return "NO"
+
+class RevisionType(AuditMixin,Model):
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
@@ -205,16 +209,16 @@ class Comments(AuditMixin, Model):
     def pretty_closed(self):
         try:
             if self.closed == True:
-                return Markup('<span style="color:#519a6c; font-size:larger"><i class="fas fa-thumbs-up"></i>')
-            return Markup('<span style="color:#dddddd; font-size:larger"><i class="fas fa-thumbs-up"></i>')
+                return Markup('<span style="color:#64979e; font-size:larger"><i class="fas fa-check-square"></i>')
+            return Markup('<span style="color:#dddddd; font-size:larger"><i class="fas fa-check-square"></i>')
         except:
             pass
     
     def pretty_included(self):
         try:
             if self.included == True:
-                return Markup('<span style="color:#7b66ad; font-size:larger"><i class="fas fa-check"></i>')
-            return Markup('<span style="color:#dddddd; font-size:larger"><i class="fas fa-check"></i>')
+                return Markup('<span style="color:#c3a967; font-size:larger"><i class="fas fa-pen-square"></i></i>')
+            return Markup('<span style="color:#dddddd; font-size:larger"><i class="fas fa-pen-square"></i></i>')
         except:
             pass
     

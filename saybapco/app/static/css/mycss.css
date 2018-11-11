@@ -121,7 +121,7 @@ p#rev_current{
     font-size: 17px;
     border: none;
     cursor: pointer;
-    color: #48a649;
+    color: #1eafa3;
   }
 
 .search-container button:hover {
@@ -170,7 +170,7 @@ input#search_input{
    opacity:  1;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color:    #ffffff;
+   color:    #4a6286;
 }
 ::-ms-input-placeholder { /* Microsoft Edge */
    color:    #ffffff;
@@ -178,4 +178,9 @@ input#search_input{
 
 ::placeholder { /* Most modern browsers support this now. */
    color:    #ffffff;
+}
+
+.table-bordered>thead>tr>th, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>tbody>tr>td, .table-bordered>tfoot>tr>td {
+    border: 1px solid #ecf0f1;
+    max-width: 600px;
 }
