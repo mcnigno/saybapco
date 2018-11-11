@@ -9,7 +9,7 @@ import uuid
 from flask import render_template, abort, flash
 from urllib.parse import urlparse, parse_qs
 import json, requests
-
+ 
 
 rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
                 'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
