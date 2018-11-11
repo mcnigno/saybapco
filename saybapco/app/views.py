@@ -3,7 +3,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import (ModelView, IndexView, BaseView, expose, MasterDetailView, 
                               DirectByChartView, GroupByChartView, CompactCRUDMixin, MultipleView)
 from app import appbuilder, db
-from .models import Document, Comments, Revisions
+from .models import Document, Comments, Revisions, RevisionType
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
                     set_current, report_url, set_position, action_include_close, action_close
@@ -925,7 +925,8 @@ class SuperDocumentView(ModelView):
     '''
 
 
-
+class RevisionTypeView(ModelView):
+    datamodel = SQLAInterface(RevisionType)
 
 
 """
@@ -942,6 +943,7 @@ def page_not_found(e):
 #db.create_all()
 from mass_update import mass_update
 #appbuilder.security_cleanup()
+appbuilder.add_view(RevisionTypeView,'Revision Type',icon="fas fa-file-pdf", category="Setting", category_icon='fas fa-file-alt')
 
 #appbuilder.add_view(UploadComments,'Upload Comments',icon="fa-folder-open-o", category="My Category", category_icon='fas fa-comment')
 #appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
