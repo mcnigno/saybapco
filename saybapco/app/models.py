@@ -109,6 +109,7 @@ class Document(AuditMixin, Model):
 class Revision_type(AuditMixin,Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+    description = Column(String(250))
 
     def __repr__(self):
         return self.name
