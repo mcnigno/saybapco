@@ -28,3 +28,4 @@ def downgrade():
     #op.drop_constraint(None, 'revisions', type_='foreignkey')
     #op.create_index('id', 'revisions', ['id'], unique=True)
     # ### end Alembic commands ###
+    pass
