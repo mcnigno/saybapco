@@ -3,7 +3,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import (ModelView, IndexView, BaseView, expose, MasterDetailView, 
                               DirectByChartView, GroupByChartView, CompactCRUDMixin, MultipleView)
 from app import appbuilder, db
-from .models import Document, Comments, Revisions, RevisionType
+from .models import Document, Comments, Revisions, Revision_type
 from helpers import (comments, check_Doc, check_reply, set_comments_blank, set_comments_included, 
                     report_all, check_doc_closed, check_doc_closed2, check_duplicates, precheck_doc,
                     set_current, report_url, set_position, action_include_close, action_close
@@ -403,7 +403,7 @@ class DocRevisionList(ModelView):
     order_columns = ['pos']
     list_columns = ['pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_widget = ListBlock
-    edit_columns = ['revision', 'trasmittal', 'date_trs','action_code', 'note']
+    edit_columns = ['revision', 'trasmittal', 'date_trs','action_code','revision_type', 'note']
     show_columns = ['pretty_doc_revision','file', 'revision', 'trasmittal', 'date_trs','note','action_code']
     label_columns = {
         
@@ -926,7 +926,10 @@ class SuperDocumentView(ModelView):
 
 
 class RevisionTypeView(ModelView):
-    datamodel = SQLAInterface(RevisionType)
+    datamodel = SQLAInterface(Revision_type)
+    list_columns = ['name']
+    edit_columns = ['name']
+    add_columns = ['name'] 
 
 
 """

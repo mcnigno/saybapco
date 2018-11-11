@@ -106,9 +106,12 @@ class Document(AuditMixin, Model):
             return "YES"
         return "NO"
 
-class RevisionType(AuditMixin,Model):
+class Revision_type(AuditMixin,Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+
+    def __repr__(self):
+        return self.name
 
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
@@ -119,6 +122,8 @@ class Revisions(AuditMixin, Model):
     note = Column(String(250))
     document_id = Column(Integer, ForeignKey('document.id'), nullable=False)
     document = relationship(Document, backref='revision')
+    revision_type_id = Column(Integer, ForeignKey('revision_type.id'), nullable=False)
+    revision_type = relationship(Revision_type, foreign_keys=[revision_type_id], primaryjoin="Revision_type.id == Revisions.revision_type_id")
     reply = Column(Boolean, default=False)
     action_code = Column(String(100))
     pos = Column(Integer, default=0)
