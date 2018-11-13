@@ -769,7 +769,7 @@ class UploadCommentsView(ModelView):
     datamodel = SQLAInterface(Revisions)
     default_view = 'add'
     base_permissions = ['can_add',]
-    add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
+    add_columns = ['file','revision_type', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     
     def pre_add(self,item):
 
