@@ -807,7 +807,7 @@ class DocumentView(ModelView):
     
     #list_template = 'appbuilder/general/model/multiple_views.html'
     show_template = 'appbuilder/general/model/show_cascade.html'
-    show_widget = ShowDocument
+    #show_widget = ShowDocument
     
 
     add_exclude_columns = ['created_on', 'changed_on','comments']
@@ -831,10 +831,11 @@ class DocumentView(ModelView):
     show_fieldsets = [
                         (
                             'Document Info',
-                            {'fields': ['code', 'revision',
-    
-                                        'changed_on',
-                                        'changed_by']}
+                            {'fields': ['code',
+                                        'partner', 
+                                        'count',
+                                        'count_closed'
+                                        ]}
                         ),
                      
                      ]
