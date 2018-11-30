@@ -428,6 +428,17 @@ class DocRevisionList(ModelView):
         self.update_redirect()
         return redirect(self.get_redirect())
     
+    @action("up_file", "Upload File", "Upload a new file for this Revision?", "fa-rocket")
+    def up_file(self, item):
+        #item = item[0]
+        print('file in item', item)
+        #item.document_id, item.partner = check_Doc(self, item) 
+        #set_current(self, item)
+        self.update_redirect()
+        #return redirect(self.get_redirect())
+        #doc = str(session['last_document'])
+
+        return redirect(url_for('RevisionFileChange.edit', pk=item.id))
     
      
 class RevisionList(ModelView):
