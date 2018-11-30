@@ -419,17 +419,19 @@ class DocRevisionList(ModelView):
 
     #@has_access
     #@permission_name('revisionview')
-    @action("current", "Current Revision", "Set This Revision as Current?", "fa-rocket")
+    @action("current", "Current Revision", "Set This Revision as Current?", "fa-rocket", multiple=False, single=True)
     def current(self, item):
-        item = item[0]
+        #item = item[0]
         print('file in item[0]', item.file)
         item.document_id, item.partner = check_Doc(self, item) 
         set_current(self, item)
         self.update_redirect()
         return redirect(self.get_redirect())
     
-    @action("up_file", "Upload File", "Upload a new file for this Revision?", "fa-rocket")
+    @action("up_file", "Change File", "Change the file for this Revision?", "fa-rocket", multiple=False, single=True)
     def up_file(self, item):
+        
+            
         #item = item[0]
         print('file in item', item)
         #item.document_id, item.partner = check_Doc(self, item) 
