@@ -8,8 +8,9 @@ $(document).ready(function(){
 });
 */
 $(document).ready(function(){
-    $("#anchorID").data('id').click(function(){
-        console.log('jojoj')
+    $("#anchorID").click(function(){
+        var rowid = (this).data('id');
+        console.log(rowid)
     }
     );
 });
