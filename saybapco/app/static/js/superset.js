@@ -15,7 +15,7 @@ $(document).ready(function(){
     );
 });
 */
-$(document).ready(function(){
+$('iframe#dash_19').load(function(){
     $(document.links).filter(function() {
         return this.hostname != window.location.hostname;
     }).attr('target', '_blank');
