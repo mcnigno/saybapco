@@ -24,7 +24,7 @@ $('#dash_19').on(function(){
 });
 */
 $(function(){
-    $('#dash_19').load(function(){
+    $('#slice_179').load(function(){
         $(this).show();
         console.log('iframe loaded successfully')
     });
