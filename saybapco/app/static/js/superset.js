@@ -5,3 +5,10 @@ $(document).ready(function(){
     }
     );
 });
+
+$(document).ready(function(){
+    $(this).data('id').click(function(){
+        console.log('jojoj')
+    }
+    );
+});
