@@ -24,7 +24,7 @@ $('#dash_19').on(function(){
 });
 */
 $(function(){
-    $('#slice_179').load(function(){
+    $('#179-cell').load(function(){
         $(this).show();
         console.log('iframe loaded successfully')
     });
