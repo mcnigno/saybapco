@@ -6,7 +6,7 @@ $(document).ready(function(){
     }
     );
 });
-*/
+
 $(document).ready(function(){
     $("#anchorID").click(function(){
         var rowid = $(this).data('id');
@@ -14,3 +14,7 @@ $(document).ready(function(){
     }
     );
 });
+*/
+$(document.links).filter(function() {
+    return this.hostname != window.location.hostname;
+}).attr('target', '_blank');
