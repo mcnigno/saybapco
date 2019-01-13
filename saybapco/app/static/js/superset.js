@@ -16,8 +16,9 @@ $(document).ready(function(){
 });
 */
 $('iframe#dash_19').load(function(){
+    console.log('iframe dash_19 ready');
     $(document.links).filter(function() {
         return this.hostname != window.location.hostname;
     }).attr('target', '_blank');
-    console.log('i did something')
+    console.log('i did something');
 });
