@@ -9,8 +9,8 @@ $(document).ready(function(){
 */
 $(document).ready(function(){
     $("#anchorID").click(function(){
-        var rowid = (this).data('id');
-        console.log(rowid)
+        var rowid = $(this).data('id');
+        console.log(rowid);
     }
     );
 });
