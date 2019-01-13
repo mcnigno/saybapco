@@ -14,11 +14,19 @@ $(document).ready(function(){
     }
     );
 });
-*/
+
 $('#dash_19').on(function(){
     console.log('iframe dash_19 ready');
     $(document.links).filter(function() {
         return this.hostname != window.location.hostname;
     }).attr('target', '_blank');
     console.log('i did something');
+});
+*/
+$(function(){
+    $('#dash_19').load(function(){
+        $(this).show();
+        console.log('iframe loaded successfully')
+    });
+        
 });
