@@ -24,7 +24,7 @@ $('#dash_19').on(function(){
 });
 */
 $(function(){
-    $('#179-cell').load(function(){
+    $('#DataTables_Table_0_wrapper').load(function(){
         $(this).show();
         console.log('iframe loaded successfully')
     });
