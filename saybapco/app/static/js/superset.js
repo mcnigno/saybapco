@@ -3,8 +3,7 @@ $('#DataTables_Table_4 > tbody > tr > td > span').each(function(span) {
     console.log(span)
 });
 
-$("#anchorID")[0].click(function(){
+$("#anchorID").click(function(){
     console.log('jojoj')
 }
-    
 );
