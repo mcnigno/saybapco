@@ -440,7 +440,8 @@ class DocRevisionList(ModelView):
         #return redirect(self.get_redirect())
         #doc = str(session['last_document'])
 
-        return redirect(url_for('RevisionFileChange.edit', pk=item.id))
+        #return redirect(url_for('RevisionFileChange.edit', pk=item.id))
+        return redirect(url_for('DocumentView.show', pk=item.id))
     
      
 class RevisionList(ModelView):
