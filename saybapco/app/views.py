@@ -969,8 +969,8 @@ appbuilder.add_view(RevisionTypeView,'Revision Type',icon="fas fa-file-pdf", cat
 #appbuilder.add_view(Report,'Reports',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
 #appbuilder.add_view(CsRepliesView,'CS Replies Status',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
 #appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
-appbuilder.add_view(CsDashboardView,'CS General Dasboard',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
-appbuilder.add_view(CsTimeDashView,'CS Time Dasboard',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsDashboardView,'CS Engineering',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsTimeDashView,'CS Vendor',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 
 appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
