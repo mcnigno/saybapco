@@ -120,6 +120,32 @@ class CsDashboardView(BaseView):
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
 
+
+
+class CsOutstandingDashView(BaseView):
+    default_view = 'csoutstandingdashview'
+    @expose('/csoutstandingdashview', methods=['POST', 'GET'])
+    def csoutstandingdashview(self):
+        print('csoutstandingdashview') 
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('csoutstandingdash.html')
+    
+    @expose('/csoutstandingdashview_rep/', methods=['POST', 'GET'])
+    def csoutstandingdashview_rep(self):
+        print('csoutstandingdashview_rep')
+        #print(request.submit.value)
+        if request.method == 'POST':        
+            print('csoutstandingdashview_rep')
+            print('csoutstandingdashview_rep')
+            ws = report_all()
+            return send_file(ws, as_attachment=True)
+        return self.render_template('reports.html')
+
+
 class CsTimeDashView(BaseView):
     default_view = 'cstimedash'
     @expose('/cstimedash', methods=['POST', 'GET'])
@@ -815,8 +841,6 @@ class UploadCommentsView(ModelView):
         return redirect(url_for('DocumentView.show', pk=doc))
         #return redirect(url_for('RevisionFileChange.edit', pk=item.id))
 
-
-
 class DocumentView(ModelView):
     datamodel = SQLAInterface(Document)
     related_views = [CurrentCommentView, DocRevisionList] 
@@ -971,6 +995,7 @@ appbuilder.add_view(RevisionTypeView,'Revision Type',icon="fas fa-file-pdf", cat
 #appbuilder.add_view(CsMonthView,'CS Status by Month',icon="fas fa-file-excel", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsDashboardView,'CS Engineering',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsTimeDashView,'CS Vendor',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(CsOutstandingDashView,'CS Outstanding',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 
 appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
