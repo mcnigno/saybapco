@@ -145,6 +145,17 @@ class CsOutstandingDashView(BaseView):
             return send_file(ws, as_attachment=True)
         return self.render_template('reports.html')
 
+class MidorewdDashboardView(BaseView):
+    default_view = 'midorewd'
+    @expose('/midorewd', methods=['POST', 'GET'])
+    def midorewd(self):
+        print('midorewd') 
+        #print(request.submit.value)
+        if request.method == 'POST':
+            print('post')
+            print('POST', request.data) 
+        #report_url(self)
+        return self.render_template('midorewd.html')
 
 class CsTimeDashView(BaseView):
     default_view = 'cstimedash'
@@ -996,6 +1007,7 @@ appbuilder.add_view(RevisionTypeView,'Revision Type',icon="fas fa-file-pdf", cat
 appbuilder.add_view(CsDashboardView,'CS Engineering',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsTimeDashView,'CS Vendor',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsOutstandingDashView,'CS Outstanding',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
+appbuilder.add_view(MidorewdDashboardView,'Early Works Document',icon="fas fa-chart-bar", category="Midor", category_icon='fas fa-tachometer-alt')
 
 appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
