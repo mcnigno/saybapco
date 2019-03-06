@@ -152,7 +152,7 @@ class MidorewdDashboardView(BaseView):
         print('midorewd') 
         #print(request.submit.value)
         if request.method == 'POST':
-            print('post')
+            print('post') 
             print('POST', request.data) 
         #report_url(self)
         return self.render_template('midorewd.html')
