@@ -14,7 +14,6 @@ from flask_appbuilder.widgets import (ListBlock, ListCarousel, ListMasterWidget,
 
 from flask_appbuilder.models.group import aggregate_count, aggregate_sum, aggregate_avg, aggregate_count
 from flask_appbuilder import action, has_access, permission_name
-from flask_appbuilder.filemanager import get_file_original_name
 from mass_update import transmittall
 from flask import request, send_file
 from config import UPLOAD_FOLDER
@@ -617,14 +616,15 @@ class RevisionFileChange(ModelView):
                         ),
                      ]
 
-    def pre_add(self,item):
+    def pre_update(self,item):
             
         print('from views, pre_add function')
         
         item.reply = check_reply(self, item)
         item.document_id, item.partner = check_Doc(self, item)
         
-        filename = get_file_original_name(item.file)
+        session['last_document'] = item.document_id
+        #filename = get_file_original_name(item.file)
         result, message = precheck_doc(self,item)
         if result == False:
             print('precheck_doc finction')
@@ -640,6 +640,14 @@ class RevisionFileChange(ModelView):
 
         comments(item)
         check_doc_closed(item.document_id)
+
+    def post_edit_redirect(self):
+        """Override this function to control the redirect after add endpoint is called."""
+        
+        doc = str(session['last_document'])
+
+        return redirect(url_for('DocumentView.show', pk=doc))
+        
 
 class MyRevisionsList(ModelView):
     
@@ -749,7 +757,7 @@ class RevisionView(ModelView):
     #list_widget = ListThumbnail
     add_exclude_columns = ['created_on', 'changed_on']
     edit_exclude_columns = ['created_on', 'changed_on']
-    edit_columns = ['trasmittal', 'revision','date_trs', 'action_code', 'note']
+    edit_columns = ['document', 'trasmittal', 'revision','date_trs', 'action_code', 'note']
     add_columns = ['file', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     show_exclude_columns = ['comments']
     base_order = ('document.code','asc')
@@ -1007,7 +1015,7 @@ appbuilder.add_view(RevisionTypeView,'Revision Type',icon="fas fa-file-pdf", cat
 appbuilder.add_view(CsDashboardView,'CS Engineering',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsTimeDashView,'CS Vendor',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 appbuilder.add_view(CsOutstandingDashView,'CS Outstanding',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
-appbuilder.add_view(MidorewdDashboardView,'Early Works Document',icon="fas fa-chart-bar", category="Midor", category_icon='fas fa-tachometer-alt')
+#appbuilder.add_view(MidorewdDashboardView,'Early Works Document',icon="fas fa-chart-bar", category="Midor", category_icon='fas fa-tachometer-alt')
 
 appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
 
