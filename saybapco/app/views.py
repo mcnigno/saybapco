@@ -22,6 +22,7 @@ from mass_update import test_closed, reply_rev, find_action, last_rev
 from flask import flash, abort, Response, g, url_for, session
 from flask_appbuilder.widgets import ListThumbnail, ListBlock
 from .customwidgets import ShowDocument
+from flask_appbuilder.filemanager import get_file_original_name
 
 def get_user():
     return g.user
