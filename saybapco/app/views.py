@@ -440,7 +440,7 @@ class DocRevisionList(ModelView):
     order_columns = ['pos']
     list_columns = ['pretty_revision','trasmittal', 'pretty_date_trs','action_code', 'note', 'download']
     #list_widget = ListBlock
-    edit_columns = ['revision', 'trasmittal', 'date_trs','action_code','revision_type', 'note']
+    edit_columns = ['revision', 'trasmittal', 'date_trs','action_code','revision_type','file_pdf', 'note']
     show_columns = ['pretty_doc_revision','file', 'revision', 'trasmittal', 'date_trs','note','action_code']
     label_columns = {
         

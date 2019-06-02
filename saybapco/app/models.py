@@ -117,6 +117,7 @@ class Revision_type(AuditMixin,Model):
 class Revisions(AuditMixin, Model):
     id = Column(Integer, primary_key=True)
     file = Column(FileColumn, nullable=False)
+    file_pdf = Column(FileColumn)
     revision = Column(String(30))
     trasmittal = Column(String(30), nullable=False)
     date_trs = Column(Date, nullable=False)

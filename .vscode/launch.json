@@ -4,6 +4,7 @@
     // Per ulteriori informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Python: Current File",
             "type": "python",
@@ -55,7 +56,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "${workspaceFolder}/app.py"
+                "FLASK_APP": "${workspaceFolder}/saybapco/app.py"
             },
             "args": [
                 "run",
