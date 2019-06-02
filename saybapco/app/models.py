@@ -137,14 +137,17 @@ class Revisions(AuditMixin, Model):
             return self.revision +"-Reply"  
         return self.revision
     
-    def file_name(self):
+    def file_name(self): 
         return get_file_original_name(str(self.file))
 
 
     def download(self):
         #return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '">Download</a>')
         #return Markup('<a href="/static/csv/' + filename +'" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
-        return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
+        if self.file_pdf:
+            return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '" download>'+'<i class="fas fa-file-excel"></i>'+'</a>'
+                        + '<a href="' + url_for('RevisionView.download', filename=str(self.file_pdf)) + '" download>'+'<i class="fas fa-file-pdf"></i>'+'</a>')
+        return Markup('<a href="' + url_for('RevisionView.download', filename=str(self.file)) + '" download>'+'<i class="fas fa-file-excel"></i>'+'</a>')
 
     def pretty_date(self):
         return self.created_on.strftime('%d, %b %Y')

@@ -188,3 +188,13 @@ input#search_input{
 #slice-container-157{
     background-color: #dddddd;
 }
+.fa-file-excel {
+    color: #1eaf7c;
+    font-size: 15pt;
+    margin-right: 10px;
+}
+.fa-file-pdf {
+    color: #af1e1e;
+    font-size: 15pt;
+    margin-right: 10px;
+}

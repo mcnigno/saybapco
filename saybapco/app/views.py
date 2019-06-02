@@ -829,7 +829,7 @@ class UploadCommentsView(ModelView):
     datamodel = SQLAInterface(Revisions)
     default_view = 'add'
     base_permissions = ['can_add',]
-    add_columns = ['file','revision_type', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
+    add_columns = ['file','file_pdf', 'revision_type', 'revision', 'trasmittal', 'date_trs','action_code', 'note']
     
     def pre_add(self,item):
 
@@ -1018,7 +1018,7 @@ appbuilder.add_view(CsTimeDashView,'CS Vendor',icon="fas fa-chart-bar", category
 appbuilder.add_view(CsOutstandingDashView,'CS Outstanding',icon="fas fa-chart-bar", category="Dashboard", category_icon='fas fa-tachometer-alt')
 #appbuilder.add_view(MidorewdDashboardView,'Early Works Document',icon="fas fa-chart-bar", category="Midor", category_icon='fas fa-tachometer-alt')
 
-appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-pdf", category="Document", category_icon='fas fa-file-alt')
+appbuilder.add_view(DocumentView,'Document List',icon="fas fa-file-alt", category="Document", category_icon='fas fa-file-alt')
 
 appbuilder.add_view(UploadCommentsView,'Upload Comments',icon="fas fa-upload", category="Comments", category_icon='fas fa-comment')
 appbuilder.add_separator(category='Comments')
