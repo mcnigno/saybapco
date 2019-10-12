@@ -988,9 +988,9 @@ class SuperDocumentView(ModelView):
 
 class RevisionTypeView(ModelView):
     datamodel = SQLAInterface(Revision_type)
-    list_columns = ['name']
-    edit_columns = ['name']
-    add_columns = ['name'] 
+    list_columns = ['name','description']
+    edit_columns = ['name','description']
+    add_columns = ['name','description'] 
 
 
 """

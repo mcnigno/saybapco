@@ -443,113 +443,6 @@ def is_current_rev(revisions, rev):
     rev_index = rev_order.index(rev)
 
 
-def mass_update():
-    folder = '/CS_TEST'
-    os.chdir(basedir + folder)
-    folder = folder + '/' #add slash at the end in order to pass to the folder to comment's function
-    rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
-                'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
-    
-    for revision in rev_order:
-        #print('processing Rev:', revision)
-        # Check the revision A ...
-        i = 0
-        for file in glob.glob("*.xlsx"):
-            i += 1
-            print("Start : %s" % time.ctime())
-            #time.sleep( 5 )
-            print("End : %s" % time.ctime()) 
-            print(i, file)
-
-            
-            _, _, _, _, _, rev, cs = file.split('-')
-            cs = cs[:-5]
-            #print('rev:', rev,'cs:', cs)
-            
-            if rev[1] == revision and cs != 'CS REP':
-                file_sec = filemanager.secure_filename(file)
-                #print(file_sec)
-                file_byte = open(file)
-                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-
-                if os.path.exists(file):
-                    src = os.path.realpath(file)
-                
-                    #head, tail = os.path.split(src)
-
-                    dst = UPLOAD_FOLDER + file_uuid
-
-                    shutil.copy(src, dst)
-            
-
-                user =random.choice(user_list)
-                #print('FILE BYTE', file_byte) 
-                #filemanager.FileManager.save_file(file_byte, file_sec)
-                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                new_rev.document_id, new_rev.partner = check_Doc(file)
-                
-                #new_rev.revision = revision
-                rev_to_check = models.Revisions
-                exist = db.session.query(rev_to_check).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:]).first()
-                if exist is not None:
-                    print('This Rev Already Exist - Not Added')
-                else:
-                    print('exist is there..', exist)
-                    
-                    new_rev.current = 1
-                    new_rev.changed_by_fk = 1
-
-                    db.session.add(new_rev)
-                    
-                    
-                    
-                    db.session.flush()
-                    set_current(new_rev)
-                    check_doc_closed(new_rev.document_id)
-        
-        db.session.commit()
-        db.session.close()
-        # Check for the replay
-                
-        for file in glob.glob("*.xlsx"):
-            _, _, _, _, _, rev, cs = file.split('-')
-            cs = cs[:-5]
-            if rev[1] == revision and cs == 'CS REP':
-                file_sec = filemanager.secure_filename(file)
-                #print('******************* REPLY')
-                #print(file_sec)
-                file_byte = open(file, mode='rb') 
-                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
-                #filemanager.FileManager.save_file(file_byte, file_sec)
-                
-                user =random.choice(user_list)
-                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:], trasmittal = 'to update', date_trs = '2015-01-01')
-                new_rev.document_id, new_rev.partner = check_Doc(file) 
-                #print('the new rev id is:', new_rev.document_id)
-                
-                #new_rev.revision = revision
-                new_rev.reply = True
-                exist = db.session.query(models.Revisions).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:], rev_to_check.reply == True).first()
-                if exist is not None:
-                    print('This Rev Already Exist - Not Added')
-                else:
-                    print('exist is there..', exist)
-                    new_rev.current = 1
-                    new_rev.changed_by_fk = 1
-
-                    db.session.add(new_rev)
-                    
-                    db.session.flush()
-                    set_current(new_rev)
-                    check_doc_closed(new_rev.document_id)
- 
-                #print(file)
-            
-                #print('REV NOT FOUND', rev[1], file)
-        db.session.commit()
-        db.session.close()
-     
-
 def set_current(item):
     print(item.document)
     doc = item.document
@@ -580,6 +473,173 @@ def set_current(item):
         print('something wrong in func - set current')
         pass
 
+ 
+
+from werkzeug.utils import secure_filename
+from app.models import Document
+
+def get_from_aim(filename,rev):
+    session = db.session
+    
+    code = filename.split('.')[0][:-7]
+    revision = rev
+    print('AIM start ***************', code, revision)
+    report = open(basedir+'/report/AIM-CS.xlsx', mode='rb')
+    wb = openpyxl.load_workbook(report)
+    ws = wb.active
+    print('report open ***************')
+
+    actioncode_dict = {
+        '1': '1 - APPROVED',
+        '2': '2 - REVIEWED WITH MINOR COMMENTS',
+        '3': '3 - REVIEWED WITH COMMENTS',
+        '4': '4 - NOT APPROVED',
+        '5': '5 - RETAINED FOR INFORMATION'
+    }
+
+    for row in ws.iter_rows(min_row=7):
+        print(row[5].value,row[8].value, code, revision)
+        if row[5].value == code and row[8].value == revision:
+            
+            action_code = actioncode_dict[row[16].value[0]]
+            transmittall = row[11].value
+            date_trs = row[12].value
+            note = row[0].value
+
+            return transmittall, date_trs, note, action_code
+    action_code = 'updating'
+    transmittall = 'updating'
+    date_trs = '2017/10/01'
+    note = 'updating'
+    return transmittall, date_trs, note, action_code
+
+
+
+def mass_update():
+    folder = '/CS_TEST'
+    os.chdir(basedir + folder)
+    folder = folder + '/' #add slash at the end in order to pass to the folder to comment's function
+    rev_order = ['A','B','C','D','E','F','G','H','I','L','M','N','O','P','Q','R','S','T',
+                'U','V','Z','0','1','2','3','4','5','6','7','8','9','10']
+    
+    for revision in rev_order:
+        #print('processing Rev:', revision)
+        # Check the revision A ...
+        i = 0
+        for file in glob.glob("*.xlsx"):
+            i += 1
+            #print("Start : %s" % time.ctime())
+            #time.sleep( 5 )
+            #print("End : %s" % time.ctime()) 
+            print(i, file)
+
+            
+            _, _, _, _, _, rev, cs = file.split('-')
+            cs = cs[:-5]
+            #print('rev:', rev,'cs:', cs)
+            
+            if rev[1] == revision and cs != 'CS REP':
+                file_sec = secure_filename(file)
+                #print(file_sec)
+                file_byte = open(file)
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+
+                if os.path.exists(file):
+                    src = os.path.realpath(file)
+                
+                    #head, tail = os.path.split(src)
+
+                    dst = UPLOAD_FOLDER + file_uuid
+
+                    shutil.copy(src, dst)
+            
+
+                user =random.choice(user_list)
+                #print('FILE BYTE', file_byte) 
+                #filemanager.FileManager.save_file(file_byte, file_sec)
+
+                #
+                #  GET info from report 
+                #   revision_type
+                #   transmittal, date_trs, action_code, note
+                #
+
+                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:])
+                new_rev.document_id, new_rev.partner = check_Doc(file)
+                new_rev.trasmittal, new_rev.date_trs, new_rev.note, new_rev.action_code = get_from_aim(file,rev[1:])
+                #new_rev.revision = revision
+                rev_to_check = models.Revisions
+                exist = db.session.query(rev_to_check).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:]).first()
+                if exist is not None:
+                    print('This Rev Already Exist - Not Added')
+                else:
+                    print('This Rev Not Existc')
+                    
+                    new_rev.current = 1
+                    new_rev.created_by_fk = 1
+                    new_rev.changed_by_fk = 1
+                    if 'X' in rev:
+                        new_rev.revision_type_id = '2'
+                    else:
+                        new_rev.revision_type_id = '1'
+
+                    db.session.add(new_rev)
+                    
+                    
+                    
+                    db.session.flush()
+                    set_current(new_rev)
+                    check_doc_closed(new_rev.document_id)
+        
+        db.session.commit()
+        db.session.close()
+        # Check for the replay
+                
+        for file in glob.glob("*.xlsx"):
+            _, _, _, _, _, rev, cs = file.split('-')
+            cs = cs[:-5]
+            if rev[1] == revision and cs == 'CS REP':
+                file_sec = secure_filename(file)
+                #print('******************* REPLY')
+                #print(file_sec)
+                file_byte = open(file, mode='rb') 
+                file_uuid = str(uuid.uuid4()) + '_sep_' + file_byte.name
+                #filemanager.FileManager.save_file(file_byte, file_sec)
+                
+                user =random.choice(user_list)
+                new_rev = models.Revisions(created_by_fk = user, changed_by_fk = user, file=file_uuid, revision = rev[1:])
+                new_rev.document_id, new_rev.partner = check_Doc(file) 
+                new_rev.trasmittal, new_rev.date_trs, new_rev.note, new_rev.action_code = get_from_aim(file,rev[1:])
+                #print('the new rev id is:', new_rev.document_id)
+                
+                #new_rev.revision = revision
+                new_rev.reply = True
+                exist = db.session.query(models.Revisions).filter(rev_to_check.document_id == new_rev.document_id, rev_to_check.revision == rev[1:], rev_to_check.reply == True).first()
+                if exist is not None:
+                    print('This Rev Already Exist - Not Added')
+                else:
+                    print('exist is there..', exist)
+                    new_rev.current = 1
+                    new_rev.created_by_fk = 1
+                    new_rev.changed_by_fk = 1
+                    if 'X' in rev:
+                        new_rev.revision_type_id = '2'
+                    else:
+                        new_rev.revision_type_id = '1'
+
+                    db.session.add(new_rev)
+                    
+                    db.session.flush()
+                    set_current(new_rev)
+                    check_doc_closed(new_rev.document_id)
+ 
+                #print(file)
+            
+                #print('REV NOT FOUND', rev[1], file)
+        db.session.commit()
+        db.session.close()
+     
+#mass_update()   
  
 def current_post(item):
 

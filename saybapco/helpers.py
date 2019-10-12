@@ -716,6 +716,7 @@ def set_comments_included():
     print('closed_by_included', closed_by_included)
     session.close()
 
+from datetime import time
 def timing(f):
     def wrap(*args):
         time1 = time.time()

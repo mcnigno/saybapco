@@ -1,4 +1,5 @@
 sayenv/
+venv/
 .vscode/
 *.DS_Store
 saybapco/app/static/uploads/
