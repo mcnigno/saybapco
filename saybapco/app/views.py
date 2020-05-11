@@ -641,7 +641,8 @@ class RevisionFileChange(ModelView):
 
         comments(item)
         check_doc_closed(item.document_id)
-
+    
+    '''
     def post_edit_redirect(self):
         """Override this function to control the redirect after add endpoint is called."""
         '''
@@ -649,7 +650,7 @@ class RevisionFileChange(ModelView):
 
         return redirect(url_for('DocumentView.show', pk=doc))
         '''
-
+    '''
 class MyRevisionsList(ModelView):
     
     datamodel = SQLAInterface(Revisions)
