@@ -645,11 +645,11 @@ class RevisionFileChange(ModelView):
     '''
     def post_edit_redirect(self):
         """Override this function to control the redirect after add endpoint is called."""
-        '''
+        
         doc = str(session['last_document'])
 
         return redirect(url_for('DocumentView.show', pk=doc))
-        '''
+        
     '''
 class MyRevisionsList(ModelView):
     
