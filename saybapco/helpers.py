@@ -111,6 +111,7 @@ def set_last_rev_comments(last_revision_list):
                 #print('delete query executed')
                 
             except:
+                session.remove()
                 abort(400,'OPEN FILE - Please check your Excel file format.')
             
 
@@ -186,6 +187,7 @@ def set_last_rev_comments(last_revision_list):
                     
                         
             except:
+                session.remove()
                 print('except for some reasons')
                 abort(400,'AFTER COMMIT - Please check your Excel file format.')
             
@@ -194,7 +196,7 @@ def set_last_rev_comments(last_revision_list):
             print('CS Commit DONE')
         
         except:
-            session.rollback()
+            session.remove()
             error_list.append(item)
             pass
     print('ERROR LIST')
@@ -245,7 +247,8 @@ def check_duplicates():
 def comments(item):
     revision = models.Revisions
     doc = item.document
-    revisions_list = db.session.query(revision).filter(revision.document_id == doc.id).order_by((revision.date_trs).asc()).all()
+    session = db.session
+    revisions_list = session.query(revision).filter(revision.document_id == doc.id).order_by((revision.date_trs).asc()).all()
     count = 0
     #revision.p
     #
@@ -264,7 +267,7 @@ def comments(item):
     this_last_rev.current = True
 
     comments = models.Comments
-    #db.session.query(comments).filter(comments.document_id == item.document_id).delete()
+    #session.query(comments).filter(comments.document_id == item.document_id).delete()
 
     
     # old comment function
@@ -295,6 +298,7 @@ def comments(item):
             
             
     except:
+        session.remove()
         abort(400,'Please check your file name.')
     
     try:
@@ -305,11 +309,12 @@ def comments(item):
         wb = openpyxl.load_workbook(file)
         ws = wb.active
 
-        session = db.session
+        session = session
         comments= models.Comments
         
         
     except:
+        session.remove()
         abort(400,'Please check your Excel file format.')
     
 
@@ -364,7 +369,7 @@ def comments(item):
             
                 
     except:
-        print()
+        session.remove()
         abort(400,'Please check your Excel file format.')
     
     
@@ -386,7 +391,7 @@ def last_rev(self, item):
     print('revisions', doc.revision)
     print('doc rev', rev)
     print('is a reply?', item.reply)
-    #revisions = db.session.query(models.Revisions).filter(models.Revisions.document_id == item.id).all()
+    #revisions = session.query(models.Revisions).filter(models.Revisions.document_id == item.id).all()
     #print('revision list', revisions)
     cur_rev_index = rev_order.index(rev)
     doc_rev_index_list = []
@@ -398,6 +403,7 @@ def last_rev(self, item):
 def set_current(self, item):
     print('set current function start')
     print(item.document)
+    session = db.session
     doc = item.document
     print('item set file', item.file)
     
@@ -405,10 +411,10 @@ def set_current(self, item):
         print(doc.id)
         #print(doc.document_id)
         
-        #comme = db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
+        #comme = session.query(models.Comments).filter(models.Comments.document_id == doc.id).all()
         #print(comme)
-        db.session.query(models.Comments).filter(models.Comments.document_id == doc.id).delete()
-        #db.session.query(models.Comments).filter(models.Comments.document_id == item.document_id).delete()
+        session.query(models.Comments).filter(models.Comments.document_id == doc.id).delete()
+        #session.query(models.Comments).filter(models.Comments.document_id == item.document_id).delete()
         
         print('not here')
         comments(item)
@@ -419,10 +425,11 @@ def set_current(self, item):
             print(rev)
             rev.current = False
         item.current = True
-        db.session.commit()
+        session.commit()
         #d.session.close()
         
     except:
+        session.remove()
         flash('something went wrong setting this revision as current. ', category='danger')
         
 
@@ -522,6 +529,7 @@ def action_close(item):
 def precheck_doc(self, item):
     filename = get_file_original_name(item.file)
     filename_list = filename.split('-',6)
+    session = db.session
 
     try:
         filename_list = filename.split('-')
@@ -536,7 +544,7 @@ def precheck_doc(self, item):
             this_reply = True
         
         print('rev.reply == item.reply',rev.reply, item.reply)
-        revision = db.session.query(rev).filter(rev.document_id == item.document_id, rev.revision == item.revision, rev.reply == this_reply).first()
+        revision = session.query(rev).filter(rev.document_id == item.document_id, rev.revision == item.revision, rev.reply == this_reply).first()
         print(filename_list[6])
 
         this_rev = item.revision
@@ -549,6 +557,7 @@ def precheck_doc(self, item):
             return False, "The Revision {0} already exist.".format(this_rev)
 
     except:
+        session.remove()
         return False, "Something Wrong Whit Your File Name: " + filename
 
     '''
@@ -596,6 +605,7 @@ def check_Doc(self, item):
 
             return document.id, document.partner
     except:
+        session.remove
         abort(400,'Please check your file name. - check_Doc')
 
 def precheck_reply(self,item):
@@ -620,19 +630,24 @@ def check_reply(self, item):
 
 def check_doc_closed(doc_id):
     doc = models.Document
-    document = db.session.query(doc).filter(doc.id==doc_id).first()
-    print('Check Doc Closed Function')
-    
-    closed = True
-    for com in document.comments:
+    session = db.session
+    try:
+        document = session.query(doc).filter(doc.id==doc_id).first()
+        print('Check Doc Closed Function')
         
-        if com.closed == False:
-            closed = False
-            break
-        print('comment closed:',com, com.closed)
-    document.closed = closed
-    document.changed_by_fk = '1'
-    db.session.commit()
+        closed = True
+        for com in document.comments:
+            
+            if com.closed == False:
+                closed = False
+                break
+            print('comment closed:',com, com.closed)
+        document.closed = closed
+        document.changed_by_fk = '1'
+        session.commit()
+    except:
+        abort(400,'Please check your file; check Doc Closed - FAIL')
+        session.remove()
     #db.session.close()
 
 def set_comments_blank():
@@ -901,22 +916,26 @@ def report_all():
 
 def check_doc_closed2():
     doc = models.Document
-    documents = db.session.query(doc).all()
-    
-    for document in documents:
+    session = db.session
+    try:
 
-        print('Check Doc Function')
-        closed = True
-        for com in document.comments:
-            
-            if com.closed == False:
-                closed = False
-                break
-            print('comment closed:',com, com.closed)
-        document.closed = closed
-        document.changed_by_fk = '1'
-        db.session.commit()
-    db.session.close()
+        documents = db.session.query(doc).all()
+        
+        for document in documents:
+
+            print('Check Doc Function')
+            closed = True
+            for com in document.comments:
+                
+                if com.closed == False:
+                    closed = False
+                    break
+                print('comment closed:',com, com.closed)
+            document.closed = closed
+            document.changed_by_fk = '1'
+            session.commit()
+    except:
+        session.remove()
         #return True
                                       
 def report_url(self):
