@@ -605,7 +605,7 @@ def check_Doc(self, item):
 
             return document.id, document.partner
     except:
-        session.remove
+        session.remove()
         abort(400,'Please check your file name. - check_Doc')
 
 def precheck_reply(self,item):
