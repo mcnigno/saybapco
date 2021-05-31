@@ -646,8 +646,9 @@ def check_doc_closed(doc_id):
         document.changed_by_fk = '1'
         session.commit()
     except:
-        abort(400,'Please check your file; check Doc Closed - FAIL')
         session.remove()
+        abort(400,'Please check your file; check Doc Closed - FAIL')
+        
     #db.session.close()
 
 def set_comments_blank():
